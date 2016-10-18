@@ -1,0 +1,288 @@
+---
+title: "PostQC.Normalization.Processing"
+author: "Angie Boysen"
+date: "October 18, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(tidyr)
+require(graphics); require(grDevices)
+library(Hmisc)
+library(gtools)
+library(cowplot)
+require(RColorBrewer)
+library(xlsx)
+library(readr)
+library(plotly)
+library(stringr)
+library(GGally)
+library(dplyr)
+```
+
+##Exploring the HILIC diatom samples
+
+#Import data - set filename with QC output here!
+```{r}
+filename <- "QC_outputExampleSkylineOutput.csv"
+mydata.overloaded <- read_csv(filename,comment = "#")
+mydata <- mydata.overloaded[,2:9]
+glimpse(mydata)
+```
+
+##Read in Internal Standard list
+Change the master list if you need to!
+```{r}
+IS.cat <- read_csv("HILIC_MasterList_Example.csv")  
+IS.cat <- IS.cat %>% filter(Group == "Internal Std") %>% 
+     select(`Compound Name`) %>% 
+     unique()
+IS.list <- IS.cat[[1]]
+IS.list
+```
+
+##look at extraction replication
+if things don't look good with some IS make sure to fix them
+or at least not include them as possibilities for normalization
+```{r, echo=FALSE}
+IS.dat <- mydata[grepl(paste(IS.list, collapse="|"), mydata$Compound.Name),]
+IS.dat <- IS.dat %>% select(Compound.Name, Area, Replicate.Name)
+ggplot(IS.dat, aes(x=Replicate.Name, y=Area)) + geom_bar(stat="identity") + facet_wrap( ~Compound.Name, scales="free_y")+theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5), legend.position = "top")  + ggtitle("IS Raw Areas")
+```
+
+##Pull out compounds that were detected
+```{r detected?, echo=F}
+Compds.detect <- mydata %>%      
+     filter(!grepl("Blk",Replicate.Name)) %>%
+     select(Replicate.Name, Compound.Name, Area) %>%
+     group_by(Compound.Name) %>%
+     summarize(percent.present = sum(!is.na(Area))/n())
+# write.csv(Compds.detect,"in.samples.csv")
+```
+
+##Rename Runs
+Name structure must be:
+Date_type_ID_replicate
+```{r echo=FALSE}
+mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
+                                str_replace("_PooledDiatoms",
+                                             "PooledDiatoms") %>%
+                                 str_replace("0801_FilterBlank",
+                                             "0801FilterBlank_1") %>%
+                                 str_replace("Blk_9",
+                                             "Blk_Blk_9") %>%
+                                 str_replace("Np", "Np_") %>%
+                                 str_replace("NP", "Np_") %>%
+                                 str_replace("Pt", "Pt_") %>%
+                                 str_replace("Tp", "Tp_") %>%
+                                 str_replace("TP", "Tp_") %>%
+                                 str_replace("160802_Smp_Pt_2", 
+                                             "160802_Smp_Pt_12"))
+```
+
+##Calculate mean values for each IS
+```{r ISmeans}
+IS.means <- IS.dat %>% filter(!grepl("Blk", Replicate.Name)) %>%
+     group_by(Compound.Name) %>%
+     summarize(ave = mean(Area, rm.na=T))
+```
+
+##Normalize to each internal Standard
+Actually scaling/adjusting by dividing by IS peak area and multiplying by the average IS peak area.
+Output is a dataframe 'area.norm' that has each peak adjusted
+to each possible internal standards
+```{r echo=FALSE}
+wArea<- mydata %>% 
+     select(Replicate.Name,Compound.Name,Area) %>%
+     spread(key=Compound.Name, value=Area) %>%
+     as.data.frame
+
+this.IS <- IS.list[1]
+area.norm <- wArea[,-1] %>% 
+          sapply(FUN = function(x) x/wArea[,grep(this.IS,
+                                                 names(wArea))]) %>%
+          as_data_frame %>% mutate(Replicate.Name = wArea$Replicate.Name) %>%
+          gather(Compound,Area_Norm, -Replicate.Name)
+this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>% 
+     select(ave) %>% as.numeric
+area.norm <- area.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
+key <- ncol(area.norm)
+count <- length(which(!is.na(area.norm$Area_Norm)))/
+               length(unique(area.norm$Replicate.Name))
+names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
+# print(paste(1, this.IS, count, sep="-"))
+
+for (i in 2:length(IS.list)){
+     this.IS <- IS.list[i]
+     if(length(wArea[,grep(this.IS, names(wArea))])!=0){
+          this.norm <- wArea[,-1] %>% 
+               sapply(FUN = function(x) x/wArea[,grep(this.IS,
+                                                      names(wArea))]) %>%
+               as_data_frame %>% 
+               mutate(Replicate.Name = wArea$Replicate.Name) %>%
+               gather(Compound,Area_Norm, -Replicate.Name)
+          this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>% 
+               select(ave) %>% as.numeric
+          this.norm <- this.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
+          key <- ncol(area.norm)
+          area.norm[,key+1] <- this.norm$Area_Norm
+          names(area.norm)[key+1] <- paste(this.IS,"Norm.Area",sep=".")
+          count <- length(which(!is.na(this.norm$Area_Norm)))/
+               length(unique(this.norm$Replicate.Name))
+          # print(paste(i, this.IS, count, sep="-"))
+     }
+}
+glimpse(area.norm)
+```
+
+#Break Up the Names
+Name structure must be:
+Date_type_ID_replicate
+```{r echo=FALSE}
+mydata_new <- area.norm %>% separate(Replicate.Name, 
+                                      c("runDate",
+                                        "type","SampID","replicate"),"_") %>%
+     mutate(Run.Cmpd = paste(area.norm$Replicate.Name,area.norm$Compound))
+mydata <- mydata %>% mutate(Run.Cmpd = paste(Replicate.Name, Compound.Name))
+
+dat <- full_join(mydata, mydata_new)
+dat <- dat %>% select(-Compound)
+# glimpse(dat)
+```
+
+##Compare normalizations
+get mean, sd, and rsd for each normalization of each compound for each sample type.
+Output is a dataframe called 'rsd.stats'
+```{r}
+no.blank.dat <- dat %>% filter(type =="Smp" | type =="Poo") %>%
+     filter(SampID!="B")
+
+rsd.stats <- no.blank.dat %>% select(-Replicate.Name, -Retention.Time,
+                                     -Notes, -Height, -IR, -S.N, -Run.Cmpd,
+                                     -runDate, -replicate) %>%
+     gather(Normer, Value, -Compound.Name, -type, - SampID) %>%
+     group_by(Compound.Name, type, SampID, Normer) %>%
+     summarize(m = mean(Value, na.rm=T), 
+                sd = sd(Value, na.rm=T), rsd = sd/m)
+glimpse(rsd.stats)
+```
+
+##Cleanup RSD data and add a minimizing column 
+One based on the multiple injetions of the pooled sample "PooModel"
+and one based on the injections of the biological replicates of samples "SmpModel"
+```{r newModeMaker}
+rsd.clean <- rsd.stats %>% filter(!is.na(m)) %>%
+     filter(Normer!="Area")
+SmpModel <- rsd.clean %>% filter(type=="Smp") %>%
+     select(-m, -sd) %>%
+     group_by(Compound.Name, Normer) %>%
+     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarize(SmpModelRSD = min(Mean.rsd),
+               Smp.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+PooModel <- rsd.clean %>% filter(type=="Poo") %>%
+     select(-m, -sd) %>%
+     group_by(Compound.Name, Normer) %>%
+     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarize(PooModelRSD = min(Mean.rsd),
+               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+Models <- full_join(PooModel, SmpModel)
+glimpse(Models)
+```
+
+##Merge Models and RSD data all together
+```{r}
+rsd.total <- full_join(rsd.stats, Models)
+```
+
+##Adjust the pooled model --> PooPlus model aka B-MIS model
+so that it normalizes metabolites that we have internal standards
+for to the appropriate internal standard. Otherwise keeps the pooled
+model. 
+Otherwise uses the PooModel for all compounds detected in the Pooled samples.
+If a compound was detected in the sample but not the pooled then use the SmpModel.
+Names this new complied model "PooPlus" (aka B-MIS)
+Output of this section is 'rsd.total': A dataframe with mean, sd, and rsd for each compound, sample type, and normalization combination and a column indicating the poo, smp and pooPlus (B-MIS) internal standard selections 
+```{r echo=FALSE}
+rsd.total <- rsd.total %>%
+     mutate(PooPlus.IS = Poo.Picked.IS) %>%
+     mutate(PooPlusModelRSD = PooModelRSD)
+
+for (i in 1:nrow(rsd.total)){
+     cmpd <- rsd.total$Compound.Name[i]
+     if(length(grep(cmpd, IS.list))>0){
+          newIS <- paste0(IS.list[grep(cmpd, IS.list)],".Norm.Area")
+          rsd.total$PooPlus.IS[i] <- newIS
+          rsd.total$PooPlusModelRSD[i] <- filter(rsd.total, 
+                                                 Compound.Name == cmpd, 
+                                                 Normer == newIS, 
+                                                 type == "Poo")$rsd
+     }
+     ## if the poo didn't pick a normalizing IS, use the samp picked one
+     if(is.na(rsd.total$Poo.Picked.IS[i]) &
+        !is.na(rsd.total$Smp.Picked.IS[i])){
+          rsd.total$PooPlus.IS[i] <- rsd.total$Smp.Picked.IS[i]
+          rsd.total$PooPlusModelRSD[i] <-
+               rsd.total$SmpModelRSD[i]
+     }
+}
+rsd.total <- rsd.total %>% 
+     select(-PooModelRSD,-PooPlusModelRSD,-SmpModelRSD)
+glimpse(rsd.total)
+```
+
+##Write out RSD data, if you want
+```{r, eval=FALSE}
+write.csv(rsd.total, "All_normalization_rsd_dat.csv")
+```
+
+##Get Actual Normalized data not just the rsds
+```{r, echo=FALSE}
+models <- rsd.total %>% ungroup %>%
+     select(Compound.Name,
+            Poo.Picked.IS,Smp.Picked.IS,PooPlus.IS) %>%
+     group_by(Compound.Name) %>%
+     summarize(PooModel.IS = unique(Poo.Picked.IS),
+               SmpModel.IS = unique(Smp.Picked.IS),
+               PooPlusModel.IS = unique(PooPlus.IS))
+dat <- dat %>% filter(!is.na(Replicate.Name))
+dat.join <- full_join(dat, models)
+
+PooModel <- c()
+SmpModel <-c()
+PooPlusModel <- c()
+for (i in 1:nrow(dat.join)){
+     if(!is.na(dat.join$PooModel.IS[i])){
+          PooModel <- c(PooModel,dat.join[i,dat.join$PooModel.IS[i]])
+     } else {
+          PooModel <- c(PooModel,NA)
+     }
+     if(!is.na(dat.join$SmpModel.IS[i])){
+          SmpModel <- c(SmpModel,dat.join[i,
+                                            dat.join$SmpModel.IS[i]])
+     } else {
+          SmpModel <- c(SmpModel,NA)
+     }
+     if(!is.na(dat.join$PooPlusModel.IS[i])){
+          PooPlusModel <- c(PooPlusModel,dat.join[i,
+                                            dat.join$PooPlusModel.IS[i]])
+     } else {
+          PooPlusModel <- c(PooPlusModel,NA)
+     }
+}
+dat.join$PooModel <- PooModel
+dat.join$SmpModel <- SmpModel
+dat.join$PooPlusModel <- PooPlusModel
+dat.join <- dat.join %>% unnest(PooModel) %>% unnest(SmpModel) %>%
+     unnest(PooPlusModel)
+glimpse(dat.join)
+```
+
+##Write out that full normalized data
+The output of the B-MIS normalized data is in the column named PooPlusModel.
+```{r, eval=FALSE}
+new.filename <- paste("Normalized_data",filename,sep="_")
+write.csv(dat.join, new.filename)
+```

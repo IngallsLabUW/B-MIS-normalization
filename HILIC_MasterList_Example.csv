@@ -1,0 +1,231 @@
+Group,Compound Name,Parent,Daughter,Retention Time,Parent Charge,Daughter Charge,Notes,Cone_voltage,Collision_energy,Quan Trace,2nd trace
+Internal Std,13C Acetyl CoA,810.2043,408.0569,10.84,-1,-1,,90,34,yes,
+Internal Std,13C Acetyl CoA,810.2043,463.1176,10.84,-1,-1,,90,34,no,yes
+Internal Std,13C-Isethionic Acid,126.95,79.997,4.69,-1,-1,,38,18,yes,
+Internal Std,13C-Isethionic Acid,126.95,95.9955,4.69,-1,-1,,38,14,no,yes
+Internal Std,13C-Sulfoacetic Acid,140.994,95.99,13.9,-1,-1,,24,12,yes,
+Internal Std,13C-Sulfoacetic Acid,140.994,79.9959,13.9,-1,-1,,24,20,no,yes
+Internal Std,13C-Sulfolactic Acid,172.014,153.991,13.275,-1,-1,,24,14,yes,
+Internal Std,13C-Sulfolactic Acid,172.014,74.0571,13.275,-1,-1,,24,18,no,yes
+Sulfur,3-Sulfopyruvic Acid,166.96,94.991,12.92,-1,-1,,6,12,yes,
+Sulfur,3-Sulfopyruvic Acid,166.96,79.9788,12.92,-1,-1,,6,20,no,yes
+Co-enzyme A,Acetyl CoA,808.149,408.0672,10.84,-1,-1,,82,32,yes,
+Co-enzyme A,Acetyl CoA,808.149,461.1161,10.84,-1,-1,,82,34,no,yes
+Organic Acid,Aconitic Acid,172.988,85.078,14.21,-1,-1,,20,12,yes,
+Organic Acid,Aconitic Acid,172.988,111.037,14.21,-1,-1,,20,8,no,yes
+Nucleic Acid,Adenine,134.032,107.124,3,-1,-1,,36,16,yes,
+Nucleic Acid,Adenine,134.032,92.0926,3,-1,-1,,36,18,no,yes
+Nucleoside,Adenosine,266.16,134.084,5.26,-1,-1,,38,20,yes,
+Nucleoside,Adenosine,266.16,107.0934,5.26,-1,-1,,38,38,no,yes
+Amino Acid synthesis,Adenosyl Homocysteine,385.152,136.125,10.85,1,1,,10,18,yes,
+Amino Acid synthesis,Adenosyl Homocysteine,385.152,88.1235,10.85,1,1,,10,20,no,yes
+Amino Acid synthesis,Adenosyl Methionine,399.226,250.175,13.01,1,1,,2,14,yes,
+Amino Acid synthesis,Adenosyl Methionine,399.226,136.117,13.01,1,1,,2,26,no,yes
+Energy charge,ADP,426.062,134.113,12.09,-1,-1,,42,20,yes,
+Energy charge,ADP,426.062,158.958,12.09,-1,-1,,42,24,no,yes
+Amino Acid,Alanine,90.02,44.14,11.3,1,1,,16,8,yes,
+Energy charge,AMP,346.096,78.988,11.585,-1,-1,,42,20,yes,
+Energy charge,AMP,346.096,97.0042,11.585,-1,-1,,42,22,no,yes
+Amino Acid,Arginine,175.149,70.147,17.93,1,1,,2,18,yes,
+Amino Acid,Arginine,175.149,116.1387,17.93,1,1,,2,12,no,yes
+Amino Acid,Asparagine,133.068,74.082,11.86,1,1,,20,14,yes,
+Amino Acid,Asparagine,133.068,87.1609,11.86,1,1,,20,8,no,yes
+Amino Acid,Aspartic acid,134.021,88.1174,12.86,1,1,,16,8,yes,
+Amino Acid,Aspartic acid,134.021,74.1265,12.86,1,1,,16,12,no,yes
+Energy charge,ATP,506.0319,158.9833,15.35,-1,-1,,44,34,no,yes
+Energy charge,ATP,506.032,408.093,15.35,-1,-1,,44,18,yes,
+Amino Acid derivative,Betaine,118.0881,42.2168,8.27,1,1,,68,78,no,yes
+Amino Acid derivative,Betaine,118.0881,58.9328,8.27,1,1,,68,16,yes,
+Amino sugar,Chitobiose,425.113,204.219,10.21,1,1,,2,10,yes,
+Amino sugar,Chitobiose,425.113,126.205,10.21,1,1,,2,22,no,yes
+Vitamin (B-like),Choline,104.0881,45.0787,14.19,1,1,,2,14,no,yes
+Vitamin (B-like),Choline,104.0881,60.1563,14.19,1,1,,2,14,yes,
+Organic Acid,Citric Acid,191.0065,87.056,17.06,-1,-1,,26,16,no,yes
+Organic Acid,Citric Acid,191.0065,111.0369,17.06,-1,-1,,26,12,yes,
+Organic Acid - nitrogenous,Creatine,132.096,90.149,11.34,1,1,,18,10,yes,
+Organic Acid - nitrogenous,Creatine,132.096,44.137,11.34,1,1,,18,10,no,yes
+Co-enzyme A,Crotonyl CoA,834.277,408.067,8.45,-1,-1,,84,34,yes,
+Co-enzyme A,Crotonyl CoA,834.277,158.9767,8.45,-1,-1,,84,62,no,yes
+Amino Acid synthesis,Cystathionine,223.1043,88.0902,13.14,1,1,,2,22,no,yes
+Amino Acid synthesis,Cystathionine,223.1043,134.0331,13.14,1,1,,2,12,yes,
+Sulfur,Cysteic Acid,167.954,151.022,12.15,-1,-1,,30,12,yes,
+Sulfur,Cysteic Acid,167.954,81.0212,12.15,-1,-1,,30,18,no,yes
+Amino Acid,Cystine,241.021,152.048,13.1,1,1,,22,12,yes,
+Amino Acid,Cystine,241.021,74.0522,13.1,1,1,,22,24,no,yes
+Nucleoside,Cytidine,242.168,109.154,7.31,-1,-1,,8,14,yes,
+Nucleoside,Cytidine,242.1681,152.1532,7.31,-1,-1,,8,12,no,yes
+Nucleic Acid,Cytosine,110.008,67.094,5.615,-1,-1,,28,10,yes,
+Nucleic Acid,Cytosine,110.008,42.1097,5.615,-1,-1,,28,12,no,yes
+Internal Std,d3-Cysteic Acid,171.024,153.967,12.15,-1,-1,,6,14,yes,
+Internal Std,d3-Cysteic Acid,171.024,81.0902,12.15,-1,-1,,6,20,no,yes
+Internal Std,d4 Succinic Acid,121.014,77.121,11.9,-1,-1,,26,12,yes,
+Internal Std,d4 Succinic Acid,121.014,102.0429,11.9,-1,-1,,26,10,no,yes
+Internal Std,d4 Taurine,128.01,79.972,7.79,-1,-1,,52,16,yes,
+Internal Std,d4 Taurine,128.01,110.0862,7.79,-1,-1,,52,16,no,yes
+Calvin cycle intermediate,DHAP,169.032,97.076,12.86,-1,-1,,48,8,yes,
+Calvin cycle intermediate,DHAP,169.032,79.0574,12.86,-1,-1,,48,18,no,yes
+Sulfur,DHPS,154.99,95.06,5.67,-1,-1,,36,18,yes,
+Sulfur,DHPS,154.9904,79.9707,5.67,-1,-1,,36,24,no,yes
+Amino Acid derivative,Dimethyl Glycine,104.0242,44.1023,8.97,1,1,,18,24,no,yes
+Amino Acid derivative,Dimethyl Glycine,104.0242,58.1401,8.97,1,1,,18,10,yes,
+Internal Std,D-Methionine,153.05,56.133,8.29,1,1,,20,14,yes,
+Internal Std,D-Methionine,153.05,107.151,8.29,1,1,,20,10,no,yes
+Sulfur,DMSP,135.021,73.096,9.325,1,1,,2,12,yes,
+Sulfur,DMSP,135.0211,63.1085,9.325,1,1,,2,12,no,yes
+Osmolyte,Ectoine,141.096,86.093,10,-1,-1,,32,12,yes,
+Osmolyte,Ectoine,141.096,95.138,10,-1,-1,,32,12,no,yes
+Lignin,Ethyl Dihydroxybenzoate,181.096,135.087,2.08,-1,-1,,6,10,yes,
+Lignin,Ethyl Dihydroxybenzoate,181.096,91.106,2.08,-1,-1,,6,22,no,yes
+Redox,FAD,784.31,437.169,7.585,-1,-1,,66,26,yes,
+Redox,FAD,784.31,346.1558,7.585,-1,-1,,66,28,no,yes
+Sugar phosphate,Fructose 6 phosphate,259.0043,96.9317,13.51,-1,-1,,8,14,no,yes
+Sugar phosphate,Fructose 6 phosphate,259.0043,168.9969,13.51,-1,-1,,8,12,yes,
+Organic Acid,Fumaric Acid,114.904,71.072,12.7,-1,-1,,16,8,yes,
+Organic Acid,Fumaric Acid,114.9042,27.0802,12.7,-1,-1,,16,10,no,yes
+Organic Acid,Gluconic Acid,195.082,129.0365,10.79,-1,-1,,6,12,yes,
+Organic Acid,Gluconic Acid,195.082,99.04,10.79,-1,-1,,6,16,no,
+Organic Acid,Gluconic Acid,195.082,75.0318,10.79,-1,-1,,6,18,no,yes
+Sugar phosphate,Glucose 1 phosphate,259.0681,78.9954,13.45,-1,-1,,8,20,no,yes
+Sugar phosphate,Glucose 1 phosphate,259.0681,241.0059,13.45,-1,-1,,8,12,yes,
+Sugar phosphate,Glucose 6 phosphate,259.062,97.042,14.12,-1,-1,,30,14,yes,
+Sugar phosphate,Glucose 6 phosphate,259.062,79.022,14.12,-1,-1,,30,34,no,yes
+Protective osmolyte,Glucosylglycerol,255.1348,85.1122,10.09,1,1,,30,16,no,yes
+Protective osmolyte,Glucosylglycerol,255.1348,93.1065,10.09,1,1,,30,6,yes,
+Amino Acid,Glutamic acid,148.085,84.156,12.41,1,1,,22,14,yes,
+Amino Acid,Glutamic acid,148.085,130.161,12.41,1,1,,22,8,no,yes
+Amino Acid,Glutamine,147.085,130.08,11.7,1,1,,16,8,yes,
+Amino Acid,Glutamine,147.085,84.1446,11.7,1,1,,16,14,no,yes
+Antioxidant,Glutathione,308.112,179.116,12,1,1,,22,10,yes,
+Antioxidant,Glutathione,308.112,162.0749,12,1,1,,22,14,no,yes
+Redox,glycerol 3 phosphate,171.042,79.051,13.065,-1,-1,,8,14,yes,
+Redox,glycerol 3 phosphate,171.042,97.0063,13.065,-1,-1,,8,16,no,yes
+Amino Acid,Glycine,76.032,30.142,9.895,1,1,,18,4,yes,
+Amino Acid,Glycine,76.032,48.1755,9.895,1,1,,18,4,no,yes
+Energy charge,GMP,362.018,210.965,13.85,-1,-1,,46,18,yes,
+Energy charge,GMP,362.018,78.99,13.85,-1,-1,,46,24,no,yes
+Energy charge,GTP,521.893,158.92,16.58,-1,-1,,64,30,yes,
+Energy charge,GTP,521.893,423.986,16.58,-1,-1,,64,18,no,yes
+Nucleic Acid,Guanine,150.032,133.086,8.95,-1,-1,,32,12,yes,
+Nucleic Acid,Guanine,150.032,107.9731,8.95,-1,-1,,32,14,no,yes
+Nucleoside,Guanosine,282.168,150.115,9.67,-1,-1,,10,20,yes,
+Nucleoside,Guanosine,282.168,133.0762,9.67,-1,-1,,10,30,no,yes
+Internal Std,Heavy Alanine,93.058,47.139,11.3,1,1,,16,8,yes,
+Internal Std,Heavy Histidine,157.054,111.105,11.45,1,1,,34,14,yes,
+Internal Std,Heavy Histidine,157.0542,84.0434,11.45,1,1,,34,24,no,yes
+Internal Std,Heavy Isoleucine,133.114,87.186,8.17,1,1,,20,10,yes,
+Internal Std,Heavy Isoleucine,133.114,69.1533,8.17,1,1,,20,16,no,yes
+Amino Acid,Histidine,156.085,110.121,11.45,1,1,,22,14,yes,
+Co-enzyme A,Hydroxybutyryl CoA,852.1043,158.902,12.1,-1,-1,,92,62,yes,
+Co-enzyme A,Hydroxybutyryl CoA,852.1043,425.8855,12.1,-1,-1,,92,34,no,yes
+Amino Acid - collagen,Hydroxylysine,163.148,128.117,16.37,1,1,,2,10,yes,
+Amino Acid - collagen,Hydroxylysine,163.148,82.1076,16.37,1,1,,2,16,no,yes
+Sulfur,Isethionic Acid,124.968,79.979,7.2,-1,-1,,6,18,yes,
+Sulfur,Isethionic Acid,124.968,95.0074,7.2,-1,-1,,6,14,no,yes
+Organic Acid,Isocitric Acid,191.0043,73.0187,15.65,-1,-1,,28,20,no,yes
+Organic Acid,Isocitric Acid,191.0043,173.035,15.65,-1,-1,,28,10,yes,
+Amino Acid,Isoleucine,132.085,86.174,8.17,1,1,,16,10,yes,
+Amino Acid,Isoleucine,132.085,69.1241,8.17,1,1,,16,16,no,yes
+Organic Acid,Ketoglutaric Acid,145.0319,101.014,10.845,-1,-1,,22,8,yes,
+Organic Acid,Ketoglutaric Acid,145.0319,57.0843,10.845,-1,-1,,22,12,no,yes
+Amino Acid,Leucine,132.085,86.175,7.63,1,1,,16,8,yes,
+Amino Acid,Leucine,132.085,43.945,7.63,1,1,,16,18,no,yes
+Amino Acid synthesis,L-Homocysteine,136.02,90.186,8.7,1,1,,14,10,yes,
+Amino Acid synthesis,L-Homocysteine,136.02,118.137,8.7,1,1,,14,6,no,yes
+Organic Acid,Lipoic Acid,205.096,171.129,2.42,-1,-1,,6,8,yes,
+Organic Acid,Lipoic Acid,205.096,93.1243,2.42,-1,-1,,6,12,no,yes
+Amino Acid,Lysine,147.085,84.145,17.5,1,1,,22,14,yes,
+Amino Acid,Lysine,147.085,130.1432,17.5,1,1,,22,8,no,yes
+Organic Acid,Malic Acid,132.968,71.067,11.97,-1,-1,,24,14,no,yes
+Organic Acid,Malic Acid,132.968,115.0458,11.97,-1,-1,,24,10,yes,
+Co-enzyme A,Malonyl CoA,852.1053,408.0135,14.79,-1,-1,,74,40,no,yes
+Co-enzyme A,Malonyl CoA,852.1053,808.0725,14.79,-1,-1,,74,24,yes,
+Sulfur,MESNA,140.996,81.033,2.67,-1,-1,,22,14,yes,
+Sulfur,MESNA,140.996,107.0633,2.67,-1,-1,,22,16,no,yes
+Amino Acid,Methionine,150.085,104.125,8.29,1,1,,14,10,yes,
+Amino Acid,Methionine,150.085,133.0777,8.29,1,1,,14,8,no,yes
+Co-enzyme A,Methyl Malonyl CoA,866.1109,407.964,13.18,-1,-1,,70,40,no,yes
+Co-enzyme A,Methyl Malonyl CoA,866.1109,822.1345,13.18,-1,-1,,70,26,yes,
+Organic Acid,Methylphosphonic Acid,94.968,79.031,11,-1,-1,,22,12,yes,
+Organic Acid,Methylphosphonic Acid,94.968,63.0183,11,-1,-1,,22,54,no,yes
+Sulfur,MTA,296.1758,134.0776,2.96,-1,-1,,42,18,yes,
+Sulfur,MTA,296.1758,107.0871,2.96,-1,-1,,42,38,no,yes
+Peptidoglycan,Muramic Acid,252.132,126.108,11,1,1,,8,16,yes,
+Peptidoglycan,Muramic Acid,252.132,216.1162,11,1,1,,8,12,no,yes
+Sulfur,N-acetyltaurine,166.183,80,3.74,-1,-1,,57,22,yes,
+Sulfur,N-acetyltaurine,166.183,107,3.74,-1,-1,,57,15,no,yes
+Redox,NAD,662.223,540.177,10.6,-1,-1,,14,18,yes,
+Redox,NAD,662.223,158.9788,10.6,-1,-1,,14,46,no,yes
+Redox,NADH,664.024,407.971,11.26,-1,-1,,80,30,yes,
+Redox,NADH,664.024,397.054,11.26,-1,-1,,80,30,no,yes
+Redox,NADP,741.974,620.007,12.74,-1,-1,,20,18,yes,
+Redox,NADP,741.974,407.976,12.74,-1,-1,,20,32,no,yes
+Redox,NADPH,744.25,408.07,13.345,-1,-1,,78,32,yes,
+Redox,NADPH,744.25,158.9762,13.345,-1,-1,,78,54,no,yes
+Organic Acid,Orotic Acid,155.032,111.088,4.195,-1,-1,,24,10,yes,
+Organic Acid,Orotic Acid,155.032,42.1119,4.195,-1,-1,,24,18,no,yes
+Organic Acid,Oxalic Acid,88.934,61.067,13.235,-1,-1,,22,8,yes,
+Organic Acid,Oxalic Acid,88.934,35.1447,13.235,-1,-1,,22,8,no,yes
+Organic Acid,PEP,166.968,79.0004,13.865,-1,-1,,36,10,yes,
+Organic Acid,PEP,166.968,139.0436,13.865,-1,-1,,36,6,no,yes
+Sugar phosphate,Phosphoglyceric Acid,185.028,97.06,14.755,-1,-1,,34,18,yes,
+Sugar phosphate,Phosphoglyceric Acid,185.0281,79.041,14.755,-1,-1,,34,26,no,yes
+Kynurenine pathway,Picolinic Acid,124.0142,78.109,5.42,1,1,,30,14,yes,
+Kynurenine pathway,Picolinic Acid,124.0142,106.0652,5.42,1,1,,30,8,no,yes
+Quorum sensing,PQS,260.204,175.156,2.16,1,1,,56,30,yes,
+Quorum sensing,PQS,260.204,146.212,2.16,1,1,,56,48,no,yes
+Amino Acid,Proline,116.085,70.102,9.49,1,1,,4,12,yes,
+Amino Acid,Proline,116.085,43.1588,9.49,1,1,,4,20,no,yes
+Co-enzyme A,Propionyl CoA,822.277,408.113,8.83,-1,-1,,68,34,yes,
+Co-enzyme A,Propionyl CoA,822.277,475.1986,8.83,-1,-1,,68,32,no,yes
+Lignin,Resorcylic Acid,153.024,108.949,4.08,-1,-1,,6,14,yes,
+Lignin,Resorcylic Acid,153.024,81.0954,4.08,-1,-1,,6,20,no,yes
+Redox,Riboflavin Monophosphate,455.204,97.042,8.6,-1,-1,,10,26,yes,
+Redox,Riboflavin Monophosphate,455.204,213.1207,8.6,-1,-1,,10,20,no,yes
+Sugar phosphate,Ribose 5 phosphate,229.052,97.049,13.29,-1,-1,,8,12,yes,
+Sugar phosphate,Ribose 5 phosphate,229.052,79.0266,13.29,-1,-1,,8,28,no,yes
+Antioxidant,Salicylic Acid,137.024,93.15,2.2,-1,-1,,28,16,yes,
+Antioxidant,Salicylic Acid,137.024,65.1148,2.2,-1,-1,,28,22,no,yes
+Glycine metabolite,Sarcosine,90.032,44.142,10.6,1,1,,14,8,yes,
+Glycine metabolite,Sarcosine,90.032,30.2064,10.6,1,1,,14,50,no,yes
+Amino Acid,Serine,106.021,60.15,11.86,1,1,,18,8,yes,
+Amino Acid,Serine,106.021,88.0752,11.86,1,1,,18,8,no,yes
+Amino Acid synthesis,Shikimic Acid,173.054,93.102,10.97,-1,-1,,30,12,yes,
+Amino Acid synthesis,Shikimic Acid,173.054,111.0545,10.97,-1,-1,,30,10,no,yes
+Organic Acid,Succinic Acid,116.968,73.08,11.9,-1,-1,,28,10,yes,
+Organic Acid,Succinic Acid,116.968,99.0396,11.9,-1,-1,,28,10,no,yes
+Co-enzyme A,Succinyl CoA,866.1105,158.9068,12.965,-1,-1,,86,64,yes,
+Co-enzyme A,Succinyl CoA,866.1105,339.0864,12.965,-1,-1,,86,52,no,yes
+Sulfur,Sulfoacetic Acid,139.024,95.062,13.9,-1,-1,,22,12,yes,
+Sulfur,Sulfoacetic Acid,139.0242,80.0281,13.9,-1,-1,,22,20,no,yes
+Sulfur,Sulfolactate,168.98,151.008,13.275,-1,-1,,24,14,yes,
+Sulfur,Sulfolactate,168.98,71.0607,13.275,-1,-1,,24,16,no,yes
+Sulfur,Taurine,123.94,79.984,10,-1,-1,,48,16,yes,
+Sulfur,Taurine,123.94,107.0507,10,-1,-1,,48,12,no,yes
+Vitamin (B1-derivative),Thiamine monophosphate,345.14,122.113,11.5,1,1,,2,12,yes,
+Vitamin (B1-derivative),Thiamine monophosphate,345.14,126.0801,11.5,1,1,,2,26,no,yes
+Vitamin (B1-derivative),Thiamine pyrophosphate,425.168,122.112,13.765,1,1,,18,20,yes,
+Vitamin (B1-derivative),Thiamine pyrophosphate,425.168,304.0697,13.765,1,1,,18,14,no,yes
+Amino Acid,Threonine,120.085,74.121,10.92,1,1,,20,8,yes,
+Amino Acid,Threonine,120.085,56.1636,10.92,1,1,,20,14,no,yes
+Nucleoside,Thymidine,241.096,151.076,3.27,-1,-1,,6,12,yes,
+Nucleoside,Thymidine,241.096,125.1212,3.27,-1,-1,,6,10,no,yes
+Nucleic Acid,Thymine,125.032,42.11,3,-1,-1,,24,12,yes,
+Amino Acid - collagen,trans Hydroxyl proline,132.034,86.132,10.07,1,1,,30,12,yes,
+Amino Acid - collagen,trans Hydroxyl proline,132.034,68.1751,10.07,1,1,,30,16,no,yes
+Antioxidant,Trehalose,341.204,179.098,13,-1,-1,,60,12,yes,
+Antioxidant,Trehalose,341.204,89.074,13,-1,-1,,60,20,no,yes
+Amino Acid,Tyrosine,182.085,136.138,9.76,1,1,,20,12,yes,
+Amino Acid,Tyrosine,182.085,165.1543,9.76,1,1,,20,8,no,yes
+Nucleotide sugar,UDP-glucosamine,606.254,385.062,12.75,-1,-1,,44,26,yes,
+Nucleotide sugar,UDP-glucosamine,606.254,158.975,12.75,-1,-1,,44,48,no,yes
+Nucleotide sugar,UDP-glucosamine,606.254,273.03,12.75,-1,-1,,44,34,no,
+Nucleotide sugar,UDP-glucose,565.21,323.15,13.59,-1,-1,,8,24,yes,
+Nucleotide sugar,UDP-glucose,565.21,78.9767,13.59,-1,-1,,8,42,no,
+Nucleotide sugar,UDP-glucose,565.21,97.06,13.59,-1,-1,,8,40,no,yes
+Nucleic Acid,Uracil,110.988,42.113,4,-1,-1,,22,12,yes,
+Nucleoside,Uridine,243.096,200.111,6.02,-1,-1,,6,10,yes,
+Nucleoside,Uridine,243.096,110.1533,6.02,-1,-1,,6,16,no,yes
+Amino Acid,Valine,118.085,72.112,9.09,1,1,,16,8,yes,
+Amino Acid,Valine,118.085,55.1295,9.09,1,1,,16,16,no,yes
+Vitamin,Vitamin B3,123.9981,53.0685,2.68,1,1,,18,22,yes,
+Vitamin,Vitamin B3,123.9981,80.536,2.68,1,1,,18,18,no,yes
