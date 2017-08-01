@@ -71,9 +71,11 @@ ggplot(IS.dat, aes(x=Replicate.Name, y=Area)) +
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 Compds.detect <- mydata %>%      
      filter(!grepl("Blk",Replicate.Name)) %>%
-     select(Replicate.Name, Compound.Name, Area) %>%
+     select(Replicate.Name, Compound.Name, Area)%>%
      group_by(Compound.Name) %>%
-     summarise(percent.present = sum(!is.na(Area))/n())
+     summarise(percent.present = sum(!is.na(Area))/n()) %>%
+  filter(percent.present > 0)
+
 print(Compds.detect$Compound.Name)
 # write.csv(Compds.detect,"in.samples.csv")
 ```
@@ -113,20 +115,36 @@ glimpse(IS.means)
 Adjust peak areas to each internal standard.  Output is a dataframe 'area.norm' that has each peak adjusted to each possible internal standards
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 wArea<- mydata %>% 
-     select(Replicate.Name,Compound.Name,Area) %>%
-     spread(key=Compound.Name, value=Area) %>% 
-     as.data.frame
-wArea.2 <- full_join(wArea, sample.key[,c("Sample.Name","Sample.Group","Bio.Normalization")], by = c("Replicate.Name"="Sample.Name")) %>%
-     mutate(inj.vol = ifelse(Sample.Group=="Poo",Bio.Normalization,NA)) %>%
+  select(Replicate.Name,Compound.Name,Area) %>%
+  filter(Compound.Name %in% Compds.detect$Compound.Name) %>%
+  spread(key=Compound.Name, value=Area) %>% 
+  as.data.frame
+wArea.2 <- left_join(wArea, sample.key[,c("Sample.Name","Sample.Group","Bio.Normalization")], by = c("Replicate.Name"="Sample.Name")) %>%
+     mutate(inj.vol = ifelse(Sample.Group=="Poo",Bio.Normalization,1)) %>%
      select(-Sample.Group, -Bio.Normalization)
 
-this.IS <- "inj.vol"
-area.norm <- wArea.2[,-1] %>% 
+# this.IS <- "inj.vol"
+# area.norm <- wArea.2[,-1] %>% 
+#           sapply(FUN = function(x) x/wArea.2[,grep(this.IS,
+#                                                  names(wArea.2))]) %>%
+#           as_data_frame %>% mutate(Replicate.Name = wArea.2$Replicate.Name) %>%
+#           gather(Compound,Area_Norm, -Replicate.Name)
+# this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>% 
+#      select(ave) %>% as.numeric
+# area.norm <- area.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
+# key <- ncol(area.norm)
+# count <- length(which(!is.na(area.norm$Area_Norm)))/
+#                length(unique(area.norm$Replicate.Name))
+# names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
+
+IS.listPlus <- c("inj.vol", IS.list)
+this.IS <- IS.listPlus[1]
+area.norm <- wArea.2[,-1] %>%
           sapply(FUN = function(x) x/wArea.2[,grep(this.IS,
                                                  names(wArea.2))]) %>%
           as_data_frame %>% mutate(Replicate.Name = wArea.2$Replicate.Name) %>%
           gather(Compound,Area_Norm, -Replicate.Name)
-this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>% 
+this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>%
      select(ave) %>% as.numeric
 area.norm <- area.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
 key <- ncol(area.norm)
@@ -134,8 +152,10 @@ count <- length(which(!is.na(area.norm$Area_Norm)))/
                length(unique(area.norm$Replicate.Name))
 names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
 
-for (i in 1:length(IS.list)){
-     this.IS <- IS.list[i]
+
+
+for (i in 2:length(IS.listPlus)){
+     this.IS <- IS.listPlus[i]
      if(length(wArea.2[,grep(this.IS, names(wArea.2))])!=0){
           this.norm <- wArea.2[,-1] %>% 
                sapply(FUN = function(x) x/wArea.2[,grep(this.IS,
@@ -177,15 +197,15 @@ Get mean, sd, and rsd for each normalization of each compound for each sample ty
 Output is a dataframe called 'rsd.stats'
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 no.blank.dat <- dat %>% filter(type =="Smp" | type =="Poo") %>%
-     filter(SampID!="B")
+  filter(!is.na(Replicate.Name))
 
 rsd.stats <- no.blank.dat %>% select(-Replicate.Name, -Retention.Time,
                                      -Notes, -Height, -IR, -S.N, -Run.Cmpd,
-                                     -runDate, -replicate) %>%
+                                     -runDate, -replicate, -Area, -Area.BlkSub) %>%
      gather(Normer, Value, -Compound.Name, -type, - SampID) %>%
      group_by(Compound.Name, type, SampID, Normer) %>%
      summarise(m = mean(Value, na.rm=T), 
-                sd = sd(Value, na.rm=T), rsd = sd/m)
+                sd = sd(Value, na.rm=T), rsd = sd/m) 
 glimpse(rsd.stats)
 ```
 
@@ -270,7 +290,7 @@ for (i in 1:length(split.dat.join)){
   split.dat.join[[i]]$PooPlusModel <- split.dat.join[[i]][,col.key]
 }
 
-unsplit.dat.join <- unsplit(split.dat.join, split.on.IS)
+unsplit.dat.join <- do.call(rbind, split.dat.join)
 glimpse(unsplit.dat.join)
 
 new.filename <- paste("New_Normalized_data",filename,sep="_")
@@ -279,3 +299,160 @@ print(paste("Your BMIS results are saved as", new.filename))
 print("The output of the B-MIS normalized data is in the column named PooPlusModel.")
 
 ```
+
+
+#Senitivity analysis - Do we have enough internal standards?  
+You need to have run BMIS and have rsd.total from the BMIS results
+And you need the IS.list
+This might take a bit...a few minutes
+```{r Do we have enough Internal Standards?, error=FALSE, message=FALSE, fig.width=8, fig.height=8}
+BMIS_sensResults <- list()
+
+Overloaded <- unsplit.dat.join  %>%      
+     filter(grepl("loaded",Notes)) %>%
+     select(Compound.Name) %>%
+     unique()
+
+rsd.sens <- rsd.total %>% 
+  select(Compound.Name:rsd) %>%
+  mutate(ISused = Normer %>% str_replace(".Norm.Area", "")) %>%
+  filter(!Compound.Name %in% Overloaded$Compound.Name)
+
+IS_number <- NA
+BMIS_failed <- as.data.frame(IS_number)
+BMIS_failed$Iteration <- NA
+BMIS_failed$Percent_Fail <- NA
+BMIS_failed$RSD <- NA
+BMIS_failed_empty <- BMIS_failed
+
+for (i in 1:length(IS.list)){
+ISsublist <- combn(IS.list, i, simplify = FALSE)
+print(paste( "On iteration ",i, " of ", length(IS.list)))
+
+#Turn into a loop for length of ISsublist, every combination of IS at each #
+if (length(ISsublist) > 50) {ISsublist <- sample(ISsublist, 50)}
+for (j in 1:length(ISsublist)){
+ISsubs <- c(ISsublist[[j]], "inj.vol")
+subrsd <- rsd.sens %>%
+  filter(ISused %in% ISsubs)
+sensSmpModel <- subrsd %>% filter(type=="Smp") %>%
+     select(-m, -sd) %>%
+     filter(!is.na(rsd)) %>%
+     group_by(Compound.Name, Normer) %>%
+     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarize(SmpModelRSD = min(Mean.rsd),
+               Smp.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+sensPooModel <- subrsd %>% filter(type=="Poo") %>%
+     select(-m, -sd) %>%
+     filter(!is.na(rsd)) %>%
+     group_by(Compound.Name, Normer) %>%
+     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarize(PooModelRSD = min(Mean.rsd),
+               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+sensModels <- full_join(sensPooModel, sensSmpModel, by = "Compound.Name")
+subrsd_sensModels <- full_join(subrsd, sensModels, by = "Compound.Name") %>%
+  filter(!is.na(Compound.Name))%>%
+  mutate(PooPlus.IS = Poo.Picked.IS) %>%
+  mutate(PooPlusModelRSD = PooModelRSD)
+
+for (k in 1:nrow(subrsd_sensModels)){
+     cmpd <- subrsd_sensModels$Compound.Name[k]
+     if(length(grep(cmpd, ISsubs))>0){
+          newIS <- paste0(ISsubs[grep(cmpd, ISsubs)],".Norm.Area")
+          subrsd_sensModels$PooPlus.IS[k] <- newIS
+     }
+     ## if the poo didn't pick a normalizing IS, use the samp picked one
+     if(is.na(subrsd_sensModels$Poo.Picked.IS[k]) &
+        !is.na(subrsd_sensModels$Smp.Picked.IS[k])){
+          subrsd_sensModels$PooPlus.IS[k] <- subrsd_sensModels$Smp.Picked.IS[i]
+          
+     }
+}
+
+sensfinalmodels <- subrsd_sensModels %>% ungroup %>%
+  select(Compound.Name, PooPlus.IS) %>%
+  group_by(Compound.Name) %>%
+  summarize(PooPlusModel.IS = unique(PooPlus.IS)) %>%
+  filter(!is.na(PooPlusModel.IS))
+
+BMIS_failed_iteration <- BMIS_failed_empty
+BMIS_failed_iteration$IS_number[1] <- i
+BMIS_failed_iteration$Iteration[1] <- j
+
+BMISFail <- sensfinalmodels %>% filter(PooPlusModel.IS == "inj.vol.Norm.Area")
+BMIS_failed_iteration$Percent_Fail[1] <- length(BMISFail$PooPlusModel.IS)/length(sensfinalmodels$PooPlusModel.IS)
+
+BMIS_failed_iteration$RSD[1] <- median(sensPooModel$PooModelRSD)
+BMIS_failed <- rbind(BMIS_failed, BMIS_failed_iteration)
+
+}
+
+}
+
+BMIS_sensResults[[1]] <- BMIS_failed
+
+
+BMIS_failed_summary <- BMIS_failed %>%
+  group_by(IS_number) %>%
+  summarise(MedPercent = median(Percent_Fail),
+            MedRSD = median(RSD))
+
+BMIS_sensResults[[2]] <- ggplot(data = BMIS_failed, aes(x = IS_number, y = RSD)) +
+  geom_point()+
+  geom_point(data = BMIS_failed_summary, aes(x = IS_number, y = MedRSD), size = 5)
+
+BMIS_sensResults[[3]] <- ggplot(data = BMIS_failed, aes(x = IS_number, y = Percent_Fail)) +
+  geom_point() +
+  geom_point(data = BMIS_failed_summary, aes(x = IS_number, y = MedPercent), size = 5)
+
+BMIS_failed_summary
+BMIS_sensResults[[2]]
+BMIS_sensResults[[3]]
+```
+
+
+
+#Plot to look at which BMIS was chosen
+Requires unsplit.data.join
+```{r ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+Parent <- read_csv(MasterList) %>%
+  mutate(Compound.Name = `Compound Name`) %>%
+  select(Compound.Name, Parent, `Retention Time`) %>%
+  unique()
+
+
+dattoplot <- unsplit.dat.join %>%
+  select(Compound.Name, PooPlusModel.IS) %>%
+  filter(!is.na(PooPlusModel.IS)) %>%
+  left_join(Parent) %>%
+  unique()
+
+IStoplot <- dattoplot %>%
+  filter (Compound.Name %in% IS.cat$`Compound Name`)%>%
+  mutate(type = "IS")
+
+NoBMIStoplot <-dattoplot %>%
+  filter(PooPlusModel.IS == "inj.vol.Norm.Area")
+
+dattoplot <- dattoplot%>%
+  filter(!Compound.Name %in% IS.cat$`Compound Name`)%>%
+  filter(!PooPlusModel.IS == "inj.vol.Norm.Area") %>%
+  mutate(type = "analyte") %>%
+  rbind(IStoplot)
+
+
+ggplot(dat = dattoplot, 
+            aes (x = `Retention Time`, y = Parent, 
+                     text = Compound.Name))+
+  geom_point(aes(fill = PooPlusModel.IS, color = type),
+                 pch=21, size = 5, alpha = 0.6) + 
+  annotate("text", x = mean(range(dattoplot$`Retention Time`)),  y = max(dattoplot$Parent),  label= "Black dots are where no BMIS were selected")+
+  scale_colour_manual(values=c("white", "black"))+
+  scale_alpha_discrete(range = c(0, 1)) +
+  geom_point(dat = NoBMIStoplot, aes(x = `Retention Time`, y = Parent ), 
+             colour = "black", size = 5) +
+  theme(legend.text=element_text(size=8))
+
+
+```
+
