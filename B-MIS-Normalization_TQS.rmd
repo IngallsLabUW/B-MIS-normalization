@@ -31,14 +31,14 @@ library(dplyr)
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 filename <- "QC_outputExampleSkylineOutput.csv"
 mydata.overloaded <- read_csv(filename,comment = "#")
-mydata <- mydata.overloaded %>% select(Replicate.Name:S.N)
+mydata <- mydata.overloaded %>% select(Replicate.Name:S.N) %>% 
+  filter(!Notes %in% c("Standards"))
 glimpse(mydata)
 
 sample.key <- read.csv("sample.key.targeted.csv")
 glimpse(sample.key)
 
 MasterList <- "HILIC_MasterList_Example.csv"
-glimpse(MasterList)
 
 FlagforIS <- "Internal Std" #Flag on your master list for the internal standards
 ```
@@ -82,20 +82,20 @@ print(Compds.detect$Compound.Name)
 ##EDIT This if your names do not follow the exact structure
 Name structure must be: Date_type_ID_replicate
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
-mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
-                                str_replace("_PooledDiatoms",
-                                             "PooledDiatoms") %>%
-                                 str_replace("0801_FilterBlank",
-                                             "0801FilterBlank_1") %>%
-                                 str_replace("Blk_9",
-                                             "Blk_Blk_9") %>%
-                                 str_replace("Np", "Np_") %>%
-                                 str_replace("NP", "Np_") %>%
-                                 str_replace("Pt", "Pt_") %>%
-                                 str_replace("Tp", "Tp_") %>%
-                                 str_replace("TP", "Tp_") %>%
-                                 str_replace("160802_Smp_Pt_2", 
-                                             "160802_Smp_Pt_12"))
+# mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
+#                                 str_replace("_PooledDiatoms",
+#                                              "PooledDiatoms") %>%
+#                                  str_replace("0801_FilterBlank",
+#                                              "0801FilterBlank_1") %>%
+#                                  str_replace("Blk_9",
+#                                              "Blk_Blk_9") %>%
+#                                  str_replace("Np", "Np_") %>%
+#                                  str_replace("NP", "Np_") %>%
+#                                  str_replace("Pt", "Pt_") %>%
+#                                  str_replace("Tp", "Tp_") %>%
+#                                  str_replace("TP", "Tp_") %>%
+#                                  str_replace("160802_Smp_Pt_2", 
+#                                              "160802_Smp_Pt_12"))
 print(unique(mydata$Replicate.Name))
 ```
 
@@ -206,7 +206,7 @@ PooModel <- rsd.clean %>% filter(type=="Poo") %>%
      group_by(Compound.Name, Normer) %>%
      summarise(Mean.rsd = mean(rsd, na.rm=T)) %>%
      summarise(PooModelRSD = min(Mean.rsd),
-               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)][1])
 Models <- full_join(PooModel, SmpModel)
 glimpse(Models)
 
@@ -230,10 +230,7 @@ for (i in 1:nrow(rsd.total)){
      if(length(grep(cmpd, IS.list))>0){
           newIS <- paste0(IS.list[grep(cmpd, IS.list)],".Norm.Area")
           rsd.total$PooPlus.IS[i] <- newIS
-          rsd.total$PooPlusModelRSD[i] <- filter(rsd.total, 
-                                                 Compound.Name == cmpd, 
-                                                 Normer == newIS, 
-                                                 type == "Poo")$rsd
+          
      }
      ## if the poo didn't pick a normalizing IS, use the samp picked one
      if(is.na(rsd.total$Poo.Picked.IS[i]) &
@@ -243,6 +240,12 @@ for (i in 1:nrow(rsd.total)){
                rsd.total$SmpModelRSD[i]
      }
 }
+
+
+
+
+
+
 rsd.total <- rsd.total %>% 
      select(-PooModelRSD,-PooPlusModelRSD,-SmpModelRSD)
 glimpse(rsd.total)
