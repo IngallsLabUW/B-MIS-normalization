@@ -26,7 +26,6 @@ library(GGally)
 library(dplyr)
 ```
 
-
 #Import data - set filenames within this chunk for QC output, master list, and sample key here
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 filename <- "QC_outputExampleSkylineOutput.csv"
@@ -108,7 +107,7 @@ IS.means <- IS.dat %>% filter(!grepl("Blk", Replicate.Name)) %>%
      summarise(ave = mean(Area, rm.na=T))
 IS.means <- rbind(IS.means, c("inj.vol",1)) %>%
      mutate(ave = as.numeric(ave))
-glimpse(IS.means)
+head(IS.means)
 ```
 
 #Normalize to each internal Standard
@@ -122,20 +121,6 @@ wArea<- mydata %>%
 wArea.2 <- left_join(wArea, sample.key[,c("Sample.Name","Sample.Group","Bio.Normalization")], by = c("Replicate.Name"="Sample.Name")) %>%
      mutate(inj.vol = ifelse(Sample.Group=="Poo",Bio.Normalization,1)) %>%
      select(-Sample.Group, -Bio.Normalization)
-
-# this.IS <- "inj.vol"
-# area.norm <- wArea.2[,-1] %>% 
-#           sapply(FUN = function(x) x/wArea.2[,grep(this.IS,
-#                                                  names(wArea.2))]) %>%
-#           as_data_frame %>% mutate(Replicate.Name = wArea.2$Replicate.Name) %>%
-#           gather(Compound,Area_Norm, -Replicate.Name)
-# this.mean <- IS.means %>% filter(Compound.Name==this.IS) %>% 
-#      select(ave) %>% as.numeric
-# area.norm <- area.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
-# key <- ncol(area.norm)
-# count <- length(which(!is.na(area.norm$Area_Norm)))/
-#                length(unique(area.norm$Replicate.Name))
-# names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
 
 IS.listPlus <- c("inj.vol", IS.list)
 this.IS <- IS.listPlus[1]
@@ -151,8 +136,6 @@ key <- ncol(area.norm)
 count <- length(which(!is.na(area.norm$Area_Norm)))/
                length(unique(area.norm$Replicate.Name))
 names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
-
-
 
 for (i in 2:length(IS.listPlus)){
      this.IS <- IS.listPlus[i]
@@ -183,7 +166,8 @@ Date_type_ID_replicate
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 mydata_new <- area.norm %>% separate(Replicate.Name, 
                                       c("runDate",
-                                        "type","SampID","replicate"),"_") %>%
+                                        "type","SampID",
+                                        "replicate"),"_") %>%
      mutate(Run.Cmpd = paste(area.norm$Replicate.Name,area.norm$Compound))
 mydata <- mydata %>% mutate(Run.Cmpd = paste(Replicate.Name, Compound.Name))
 
@@ -260,11 +244,6 @@ for (i in 1:nrow(rsd.total)){
                rsd.total$SmpModelRSD[i]
      }
 }
-
-
-
-
-
 
 rsd.total <- rsd.total %>% 
      select(-PooModelRSD,-PooPlusModelRSD,-SmpModelRSD)
