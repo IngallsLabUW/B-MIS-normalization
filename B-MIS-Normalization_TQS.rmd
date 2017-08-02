@@ -1,7 +1,7 @@
 ---
 title: "Best Matched Internal Standard for Targeted TQS Data"
 author: "Boysen and Heal et al"
-date: "July 31, 2017"
+date: "August 1, 2017"
 output:
   pdf_document: default
   html_document: default
@@ -9,7 +9,6 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(dev = 'pdf')
-
 
 library(ggplot2)
 library(tidyr)
@@ -42,6 +41,49 @@ MasterList <- "HILIC_MasterList_Example.csv"
 FlagforIS <- "Internal Std" #Flag on your master list for the internal standards
 ```
 
+##Get sample info from the sample key
+#If the sample key doesn't have the columns named runDate, type, SampID, and replicate then it will look in the Sample.Name column to try to generate this information; your names will need to be in the correct structure:
+Name structure must be: Date_type_ID_replicate
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+colns <- c("runDate", "type", "SampID", "replicate")
+if(all(colns %in% names(sample.key))){
+     print("Your sample key has the right columns")
+     sample.key.2 <- sample.key %>% 
+          filter(type!="Std")
+} else {
+     print(paste(c("Your sample key didn't have the columns:",
+                   colns), collapse = " "))
+     print("trying to make columns from sample name")
+     
+     ##EDIT This if your names do not follow the exact structure
+     # mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
+     #                                  str_replace("160802_Smp_Pt_2", 
+     #                                              "160802_Smp_Pt_12"))
+     # print(unique(mydata$Replicate.Name))
+     
+     #Break Up the Names
+     # Name structure must be:
+     # Date_type_ID_replicate
+     sample.key.1 <- sample.key %>% 
+           filter(!grepl("Std",Sample.Name)) 
+     sample.key.2 <- sample.key.1 %>% 
+          separate(Sample.Name,  c("runDate","type","SampID",
+                                   "replicate"),"_") %>%
+          mutate(Sample.Name = sample.key.1$Sample.Name)
+}
+
+print(sample.key.2 %>% select(runDate:replicate) %>% unique)
+```
+
+#Merge sample info with all datat
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+sample.info <- sample.key.2 %>%
+     select(Sample.Name, runDate, type, SampID, replicate)
+mydata <- left_join(mydata, sample.info,
+                  by = c("Replicate.Name" = "Sample.Name"))
+```
+
+
 #Internal Standard list that BMIS will match to
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 IS.cat <- read_csv(MasterList) %>% filter(Group == FlagforIS) %>% 
@@ -55,7 +97,8 @@ print(IS.list)
 If things don't look good with some IS or certain samples, make sure to fix them or at least not include them as possibilities for normalization
 ```{r,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}
 IS.dat <- mydata[grepl(paste(IS.list, collapse="|"), mydata$Compound.Name),]
-IS.dat <- IS.dat %>% select(Compound.Name, Area, Replicate.Name)
+IS.dat <- IS.dat %>% 
+     select(Compound.Name, Area, Replicate.Name,type,SampID, replicate)
 ggplot(IS.dat, aes(x=Replicate.Name, y=Area)) + 
   geom_bar(stat="identity") + 
   facet_wrap( ~Compound.Name, scales="free_y")+ 
@@ -69,7 +112,7 @@ ggplot(IS.dat, aes(x=Replicate.Name, y=Area)) +
 #Generate a list of compounds that were detected
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 Compds.detect <- mydata %>%      
-     filter(!grepl("Blk",Replicate.Name)) %>%
+     filter(type!="Blk") %>%
      select(Replicate.Name, Compound.Name, Area)%>%
      group_by(Compound.Name) %>%
      summarise(percent.present = sum(!is.na(Area))/n()) %>%
@@ -79,35 +122,16 @@ print(Compds.detect$Compound.Name)
 # write.csv(Compds.detect,"in.samples.csv")
 ```
 
-#Rename Runs - optional chunk to adjust the naming of individual runs 
-##EDIT This if your names do not follow the exact structure
-Name structure must be: Date_type_ID_replicate
-```{r, error = FALSE, warning=FALSE, message=FALSE}
-# mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
-#                                 str_replace("_PooledDiatoms",
-#                                              "PooledDiatoms") %>%
-#                                  str_replace("0801_FilterBlank",
-#                                              "0801FilterBlank_1") %>%
-#                                  str_replace("Blk_9",
-#                                              "Blk_Blk_9") %>%
-#                                  str_replace("Np", "Np_") %>%
-#                                  str_replace("NP", "Np_") %>%
-#                                  str_replace("Pt", "Pt_") %>%
-#                                  str_replace("Tp", "Tp_") %>%
-#                                  str_replace("TP", "Tp_") %>%
-#                                  str_replace("160802_Smp_Pt_2", 
-#                                              "160802_Smp_Pt_12"))
-print(unique(mydata$Replicate.Name))
-```
 
 #Calculate mean values for each IS
 ```{r ISmeans, error = FALSE, warning=FALSE, message=FALSE}
-IS.means <- IS.dat %>% filter(!grepl("Blk", Replicate.Name)) %>%
+IS.means <- IS.dat %>% 
+     filter(type!="Blk") %>%
      group_by(Compound.Name) %>%
      summarise(ave = mean(Area, rm.na=T))
 IS.means <- rbind(IS.means, c("inj.vol",1)) %>%
      mutate(ave = as.numeric(ave))
-head(IS.means)
+glimpse(IS.means)
 ```
 
 #Normalize to each internal Standard
@@ -118,7 +142,7 @@ wArea<- mydata %>%
   filter(Compound.Name %in% Compds.detect$Compound.Name) %>%
   spread(key=Compound.Name, value=Area) %>% 
   as.data.frame
-wArea.2 <- left_join(wArea, sample.key[,c("Sample.Name","Sample.Group","Bio.Normalization")], by = c("Replicate.Name"="Sample.Name")) %>%
+wArea.2 <- left_join(wArea, sample.key.2[,c("Sample.Name","Sample.Group","Bio.Normalization")], by = c("Replicate.Name"="Sample.Name")) %>%
      mutate(inj.vol = ifelse(Sample.Group=="Poo",Bio.Normalization,1)) %>%
      select(-Sample.Group, -Bio.Normalization)
 
@@ -160,15 +184,11 @@ for (i in 2:length(IS.listPlus)){
 glimpse(area.norm)
 ```
 
-#Break Up the Names
-Name structure must be:
-Date_type_ID_replicate
+
+#Merge all data
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
-mydata_new <- area.norm %>% separate(Replicate.Name, 
-                                      c("runDate",
-                                        "type","SampID",
-                                        "replicate"),"_") %>%
-     mutate(Run.Cmpd = paste(area.norm$Replicate.Name,area.norm$Compound))
+mydata_new <- area.norm %>%
+     mutate(Run.Cmpd = paste(Replicate.Name,Compound))
 mydata <- mydata %>% mutate(Run.Cmpd = paste(Replicate.Name, Compound.Name))
 
 dat <- full_join(mydata, mydata_new)
@@ -181,11 +201,14 @@ Get mean, sd, and rsd for each normalization of each compound for each sample ty
 Output is a dataframe called 'rsd.stats'
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 no.blank.dat <- dat %>% filter(type =="Smp" | type =="Poo") %>%
-  filter(!is.na(Replicate.Name))
+  filter(!is.na(Replicate.Name)) %>%
+  filter(Compound.Name %in% Compds.detect$Compound.Name)
 
 rsd.stats <- no.blank.dat %>% select(-Replicate.Name, -Retention.Time,
-                                     -Notes, -Height, -IR, -S.N, -Run.Cmpd,
-                                     -runDate, -replicate, -Area, -Area.BlkSub) %>%
+                                     -Notes, -Height, -IR, 
+                                     -S.N, -Run.Cmpd,
+                                     -runDate, -replicate, 
+                                     -Area, -Area.BlkSub) %>%
      gather(Normer, Value, -Compound.Name, -type, - SampID) %>%
      group_by(Compound.Name, type, SampID, Normer) %>%
      summarise(m = mean(Value, na.rm=T), 
