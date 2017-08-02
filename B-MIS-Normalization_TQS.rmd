@@ -55,24 +55,27 @@ if(all(colns %in% names(sample.key))){
                    colns), collapse = " "))
      print("trying to make columns from sample name")
      
-     ##EDIT This if your names do not follow the exact structure
-     # mydata <- mydata %>% mutate(Replicate.Name = Replicate.Name %>%
-     #                                  str_replace("160802_Smp_Pt_2", 
-     #                                              "160802_Smp_Pt_12"))
-     # print(unique(mydata$Replicate.Name))
+     ##EDIT This if your names do not follow the exact structure described above
+     sample.key <- sample.key %>% 
+          filter(!grepl("Std",Sample.Name)) %>%
+          mutate(Sample.Name.new = Sample.Name %>%
+                      str_replace("ExtractsFull_",
+                                  "Extracts_Full") %>%
+                      str_replace("ExtractsHalf_",
+                                  "Extracts_Half")) 
+     # print(unique(sample.key$Sample.Name.new))
      
      #Break Up the Names
      # Name structure must be:
      # Date_type_ID_replicate
      sample.key.1 <- sample.key %>% 
-           filter(!grepl("Std",Sample.Name)) 
+          filter(!grepl("Std",Sample.Name)) 
      sample.key.2 <- sample.key.1 %>% 
-          separate(Sample.Name,  c("runDate","type","SampID",
-                                   "replicate"),"_") %>%
-          mutate(Sample.Name = sample.key.1$Sample.Name)
+          separate(Sample.Name.new,  c("runDate","type","SampID",
+                                       "replicate"),"_")
 }
 
-print(sample.key.2 %>% select(runDate:replicate) %>% unique)
+print(sample.key.2 %>% select(runDate:SampID) %>% unique)
 ```
 
 #Merge sample info with all datat
