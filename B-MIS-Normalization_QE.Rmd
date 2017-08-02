@@ -1,0 +1,388 @@
+get---
+title: "QE.XCMS.CyanoAq.TM2P.Diatoms.BMIS"
+author: "Angie Boysen"
+date: "Feb 9, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(dev = 'pdf')
+
+library(ggplot2)
+library(tidyr)
+require(graphics); require(grDevices)
+library(Hmisc)
+library(gtools)
+library(cowplot)
+require(RColorBrewer)
+# library(xlsx)
+library(readr)
+library(plotly)
+library(stringr)
+library(GGally)
+library(dplyr)
+```
+
+
+#Import data - set filenames within this chunk for xcms output, sample key, and ISdata
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+filename <- "xset.filtered.csv"
+xcms.dat <- read_csv(filename)
+xcms.names <- names(xcms.dat)
+
+ISfilename1 <- "IS_ResultsNeg.csv"
+ISfilename2 <- "IS_ResultsPos.csv"
+ISdatfull <- read_csv(ISfilename1) %>% rbind(read_csv(ISfilename2))
+
+SampKeyfilename <- "sample.key.untargeted.csv"
+```
+
+#Read in Internal Standard data, add in injec_volume data from Sample Key
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+IS.dat <- ISdatfull %>%
+     select(`Replicate Name`, `Precursor Ion Name`, Area) %>%
+     mutate(MassFeature = `Precursor Ion Name`) %>%
+  select(-`Precursor Ion Name`)
+
+SampKey <- read_csv(SampKeyfilename) %>%
+  filter(Sample.Name %in% IS.dat$`Replicate Name`) %>%
+  select(Sample.Name, Injec_vol) %>%
+  filter(!is.na(Injec_vol))%>%
+  mutate(MassFeature = "Inj_vol",
+         Area = Injec_vol,
+         `Replicate Name` = Sample.Name) %>%
+  select(`Replicate Name`, Area, MassFeature)
+
+IS.dat <- rbind(IS.dat, SampKey)
+glimpse(IS.dat)
+```
+
+
+#Look at extraction replication of the Internal Standards
+If things don't look good with some IS or certain samples, make sure to fix them or at least not include them as possibilities for normalization
+```{r,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}
+ggplot(IS.dat, aes(x=`Replicate Name`, y=Area)) + 
+  geom_bar(stat="identity") + 
+  facet_wrap( ~MassFeature, scales="free_y")+
+  theme(axis.text.x = element_text(angle = 90, hjust = 1,vjust = 0.5, size = 5), 
+        axis.text.y = element_text(size = 7),
+        legend.position = "top",
+        strip.text = element_text(size = 7))+
+  ggtitle("IS Raw Areas")
+```
+
+#Edit IS data if necessary
+Optional if there are certain IS that aren't trustworth
+```{r ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}
+IS.dat <- IS.dat %>%
+  filter (MassFeature != "Heavy Acetyl CoA") %>%
+  filter (MassFeature != "Heavy Succinic Acid")
+```
+
+
+#Get untargeted data into long format
+```{r,  error = FALSE, warning=FALSE, message=FALSE}
+IS.dat <- IS.dat %>% mutate(Replicate.Name = `Replicate Name` %>%
+                                str_replace("-","."))  %>%
+  select(Area, Replicate.Name, MassFeature)
+
+replicates <- paste0("X",unique(IS.dat$Replicate.Name)) #Only use this if you have numbers at the beginning of runs
+
+col.key <-  xcms.names %in% replicates
+
+xcms.long <- cbind(xcms.dat[,col.key],MassFeature = xcms.dat$MassFeature) %>%
+     gather(Replicate.Name, Area, -MassFeature)
+glimpse(xcms.long)
+```
+
+#Rename Runs - optional chunk to adjust the naming of individual runs 
+##EDIT This if your names do not follow the exact structure
+Name structure must be: Date_type_ID_replicate
+```{r ,  error = FALSE, warning=FALSE, message=FALSE}
+xcms.long <- xcms.long %>%
+  mutate(Replicate.Name = Replicate.Name %>%
+            str_replace("_Blk_Blk_M","_Blk_M")%>%
+            str_replace("ExtractsFull_","Extracts_Full")%>%
+           str_replace("ExtractsHalf_","Extracts_Half"))
+
+IS.dat <- IS.dat %>%
+  mutate(Replicate.Name = Replicate.Name %>%
+           str_replace("17","X17") %>%
+            str_replace("_Blk_Blk_M","_Blk_M")%>%
+           str_replace("ExtractsFull_","Extracts_Full")%>%
+           str_replace("ExtractsHalf_","Extracts_Half"))
+
+print(unique(xcms.long$Replicate.Name))
+```
+
+#Calculate mean values for each IS
+```{r ISmeans,  error = FALSE, warning=FALSE, message=FALSE}
+IS.means <- IS.dat %>% filter(!grepl("_Blk_", Replicate.Name)) %>%
+  mutate(MassFeature = as.factor(MassFeature))%>%
+     group_by(MassFeature) %>%
+     summarise(ave = mean(Area))
+head(IS.means)
+```
+
+#Normalize to each internal Standard
+Adjust peak areas to each internal standard.  Output is a dataframe 'area.norm' that has each peak adjusted to each possible internal standards
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+binded <- rbind(IS.dat, xcms.long)
+wArea<- binded %>% 
+     select(Replicate.Name, MassFeature, Area) %>%
+     spread(key=MassFeature, value=Area) %>%
+     as.data.frame
+
+IS.list <- unique(IS.dat$MassFeature)
+this.IS <- IS.list[1]
+area.norm <- wArea[,-1] %>% 
+          sapply(FUN = function(x) x/wArea[,grep(this.IS,
+                                                 names(wArea))]) %>%
+          as_data_frame %>% mutate(Replicate.Name = wArea$Replicate.Name) %>%
+          gather(MassFeature,Area_Norm, -Replicate.Name)
+this.mean <- IS.means %>% filter(MassFeature==this.IS) %>% 
+     select(ave) %>% as.numeric
+area.norm <- area.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
+key <- ncol(area.norm)
+count <- length(which(!is.na(area.norm$Area_Norm)))/
+               length(unique(area.norm$Replicate.Name))
+names(area.norm)[key] <- paste(this.IS,"Norm.Area",sep=".")
+# print(paste(1, this.IS, count, sep="-"))
+
+for (i in 2:length(IS.list)){
+     this.IS <- IS.list[i]
+     if(length(wArea[,grep(this.IS, names(wArea))])!=0){
+          this.norm <- wArea[,-1] %>% 
+               sapply(FUN = function(x) x/wArea[,grep(this.IS,
+                                                      names(wArea))]) %>%
+               as_data_frame %>% 
+               mutate(Replicate.Name = wArea$Replicate.Name) %>%
+               gather(MassFeature,Area_Norm, -Replicate.Name)
+          this.mean <- IS.means %>% filter(MassFeature==this.IS) %>% 
+               select(ave) %>% as.numeric
+          this.norm <- this.norm %>% mutate(Area_Norm = Area_Norm*this.mean)
+          key <- ncol(area.norm)
+          area.norm[,key+1] <- this.norm$Area_Norm
+          names(area.norm)[key+1] <- paste(this.IS,"Norm.Area",sep=".")
+          count <- length(which(!is.na(this.norm$Area_Norm)))/
+               length(unique(this.norm$Replicate.Name))
+          # print(paste(i, this.IS, count, sep="-"))
+     }
+}
+glimpse(area.norm)
+```
+
+
+#Break Up the Names
+Name structure must be:
+Date_type_ID_replicate
+```{r , error = FALSE, warning=FALSE, message=FALSE}
+mydata_new <- area.norm %>% separate(Replicate.Name, 
+                                      c("runDate",
+                                        "type","SampID","replicate"),"_") %>%
+     mutate(Run.Cmpd = paste(area.norm$Replicate.Name,area.norm$MassFeature))
+binded <- binded %>% mutate(Run.Cmpd = paste(Replicate.Name, MassFeature))
+
+dat <- full_join(binded, mydata_new)
+print(dat %>% select(runDate:replicate) %>% unique)
+```
+
+##Compare normalizations
+Get mean, sd, and rsd for each normalization of each compound for each sample type.
+Output is a dataframe called 'rsd.stats'
+```{r, error = FALSE, warning=FALSE, message=FALSE}
+no.blank.dat <- dat %>% filter(type =="Smp" | type =="Poo") 
+
+rsd.stats <- no.blank.dat %>% select(-Replicate.Name,  -Run.Cmpd,
+                                     -runDate, -replicate) %>%
+     gather(Normer, Value, -MassFeature, -type, - SampID) %>%
+     group_by(MassFeature, type, SampID, Normer) %>%
+     summarise(m = mean(Value, na.rm=T), 
+                sd = sd(Value, na.rm=T), rsd = sd/m)
+glimpse(rsd.stats)
+```
+
+#Cleanup RSD data and add a minimizing column, get the BMIS of each MassFeature (PooPlusIS)
+One based on the multiple injetions of the pooled sample "PooModel"
+```{r error = FALSE, warning=FALSE, message=FALSE}
+rsd.clean <- rsd.stats %>% filter(!is.na(m))  %>%
+     filter(Normer!="Area")
+
+PooModel <- rsd.clean %>% filter(type=="Poo") %>%
+     select(-m, -sd) %>%
+     group_by(MassFeature, Normer) %>%
+     summarise(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarise(PooModelRSD = min(Mean.rsd),
+               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)][1])
+Models <- PooModel
+glimpse(Models)
+
+rsd.total <- full_join(rsd.stats, Models) %>%
+       mutate(PooPlusModelRSD = PooModelRSD)%>%
+  mutate(PooPlus.IS = Poo.Picked.IS)
+
+rsd.total <- rsd.total %>% 
+     select(-PooModelRSD,-PooPlusModelRSD)
+glimpse(rsd.total)
+```
+
+#Get Adjusted areas after choosing a BMIS
+```{r error = FALSE, warning=FALSE, message=FALSE}
+models <- rsd.total %>% ungroup %>%
+     select(MassFeature, PooPlus.IS) %>%
+     group_by(MassFeature) %>%
+     summarise(PooPlusModel.IS = unique(PooPlus.IS))
+dat <- dat %>% filter(!is.na(Replicate.Name))
+dat.join <- as.data.frame(full_join(dat, models)) %>%
+  mutate(PooPlusModel = NA)
+
+split.on.IS <- as.factor(dat.join$PooPlusModel.IS)
+split.dat.join <- split(dat.join, split.on.IS)
+for (i in 1:length(split.dat.join)){
+  col.key <-  which(names(split.dat.join[[i]])==names(split.dat.join)[i])
+  split.dat.join[[i]]$PooPlusModel <- split.dat.join[[i]][,col.key]
+}
+
+unsplit.dat.join <- unsplit(split.dat.join, split.on.IS)
+glimpse(unsplit.dat.join)
+
+
+
+new.filename <- paste("BMISd",filename,sep="_")
+write.csv(unsplit.dat.join, new.filename)
+print(paste("Your BMIS results are saved as", new.filename))
+print("The output of the B-MIS normalized data is in the column named PooPlusModel.")
+```
+
+
+
+#Senitivity analysis - Do we have enough internal standards?  
+You need to have run BMIS and have rsd.total from the BMIS results
+And you need the IS.list
+This might take a bit...several minutes on a medium-high powered computer
+```{r Do we have enough Internal Standards?, error=FALSE, message=FALSE, fig.width=8, fig.height=8}
+rsd.sens <- rsd.total %>% 
+  select(`MassFeature`:rsd) %>%
+  filter(!`MassFeature` %in% IS.list) %>%
+  mutate(ISused = Normer %>% str_replace(".Norm.Area", ""))
+
+IS_number <- NA
+BMIS_failed <- as.data.frame(IS_number)
+BMIS_failed$Iteration <- NA
+BMIS_failed$Percent_Fail <- NA
+BMIS_failed$RSD <- NA
+BMIS_failed_empty <- BMIS_failed
+
+for (i in 1:length(IS.list)){
+ISsublist <- combn(IS.list, i, simplify = FALSE)
+print(paste( "On iteration ",i, " of ", length(IS.list)))
+
+#Turn into a loop for length of ISsublist, every combination of IS at each #
+if (length(ISsublist) > 50) {ISsublist <- sample(ISsublist, 50)}
+for (j in 1:length(ISsublist)){
+ISsubs <- c(ISsublist[[j]], "Inj_vol")
+subrsd <- rsd.sens %>%
+  filter(ISused %in% ISsubs)
+sensPooModel <- subrsd %>% filter(type=="Poo") %>%
+     select(-m, -sd) %>%
+     filter(!is.na(rsd)) %>%
+     group_by(MassFeature, Normer) %>%
+     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
+     summarize(PooModelRSD = min(Mean.rsd),
+               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
+subrsd_sensModels <- full_join(subrsd, sensPooModel, by = "MassFeature") %>%
+  filter(!is.na(MassFeature))%>%
+  mutate(PooPlus.IS = Poo.Picked.IS) %>%
+  mutate(PooPlusModelRSD = PooModelRSD)
+
+sensfinalmodels <- subrsd_sensModels %>% ungroup %>%
+  select(MassFeature, PooPlus.IS) %>%
+  group_by(MassFeature) %>%
+  summarize(PooPlusModel.IS = unique(PooPlus.IS)) %>%
+  filter(!is.na(PooPlusModel.IS))
+
+BMIS_failed_iteration <- BMIS_failed_empty
+BMIS_failed_iteration$IS_number[1] <- i
+BMIS_failed_iteration$Iteration[1] <- j
+
+BMISFail <- sensfinalmodels %>% filter(PooPlusModel.IS == "Inj_vol.Norm.Area")
+BMIS_failed_iteration$Percent_Fail[1] <- length(BMISFail$PooPlusModel.IS)/length(sensfinalmodels$PooPlusModel.IS)
+
+BMIS_failed_iteration$RSD[1] <- median(sensPooModel$PooModelRSD)
+BMIS_failed <- rbind(BMIS_failed, BMIS_failed_iteration)
+
+}
+
+}
+
+BMIS_sensResults[[1]] <- BMIS_failed
+
+
+BMIS_failed_summary <- BMIS_failed %>%
+  group_by(IS_number) %>%
+  summarise(MedPercent = median(Percent_Fail),
+            MedRSD = median(RSD))
+
+BMIS_sensResults[[2]] <- ggplot(data = BMIS_failed, aes(x = IS_number, y = RSD)) +
+  geom_point()+
+  geom_point(data = BMIS_failed_summary, aes(x = IS_number, y = MedRSD), size = 5)
+
+BMIS_sensResults[[3]] <- ggplot(data = BMIS_failed, aes(x = IS_number, y = Percent_Fail)) +
+  geom_point() +
+  geom_point(data = BMIS_failed_summary, aes(x = IS_number, y = MedPercent), size = 5)
+
+BMIS_failed_summary
+BMIS_sensResults[[2]]
+BMIS_sensResults[[3]]
+```
+
+
+
+#Plot to look at which BMIS was chosen
+Requires unsplit.data.join
+```{r ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+xcms.subset <- xcms.dat %>% select(mz, rt, MassFeature)
+IS.dat <- ISdatfull %>%
+  mutate(rt = `Retention Time`*60, 
+         mz = `Precursor Mz`,
+         MassFeature = `Precursor Ion Name`)
+
+
+
+IStoplot <- IS.dat %>%
+  select(MassFeature, rt, mz) %>%
+   group_by(MassFeature) %>%
+  summarise(rt = mean(rt), mz = mean(mz)) %>%
+   mutate(type = "IS",
+         PooPlusModel.IS = MassFeature)
+
+
+
+dattoplot <- unsplit.dat.join %>%
+  select(MassFeature, PooPlusModel.IS) %>%
+  filter(!is.na(PooPlusModel.IS)) %>%
+  mutate(PooPlusModel.IS = PooPlusModel.IS %>% str_replace(".Norm.Area", "")) %>%
+  left_join(xcms.subset) %>%
+  filter(!is.na(mz)) %>%
+  unique() %>%
+  mutate(type = "analyte") %>%
+  rbind(IStoplot)
+
+NoBMIStoplot <-dattoplot %>%
+  filter(PooPlusModel.IS == "Inj_vol")
+
+dattoplot <- dattoplot %>%
+  filter(!PooPlusModel.IS == "Inj_vol")
+
+ggplot(dat = dattoplot, aes (x = rt, y = mz, text = MassFeature))+
+  geom_point(aes(fill = PooPlusModel.IS, color = type, alpha = type),
+                 pch=21, size = 2, alpha = 0.6) +
+  scale_colour_manual(values=c("white", "black"))+ 
+  annotate("text", x = mean(range(dattoplot$`Retention Time`)),  y = max(dattoplot$Parent),  label= "Black dots are where no BMIS were selected")+
+  geom_point(dat = NoBMIStoplot, aes(x = `rt`, y = mz ), 
+             colour = "black", size = 2) +
+  theme(legend.text=element_text(size=8))
+
+```
+
+Black dots are where no BMIS were selected
