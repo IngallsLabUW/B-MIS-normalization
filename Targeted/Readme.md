@@ -39,6 +39,7 @@ It requires the following packages available on CRAN:
 Input files for testing code are:
 * HILIC_MasterList_Example.csv
 * QC_outputExampleSkylineOutput.csv
+* sample.key.targeted.csv
 
 Output should match the files
 * New_All_normalization_rsd_dat.csv
