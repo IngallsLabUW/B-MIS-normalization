@@ -1,0 +1,181 @@
+Protein Name,Replicate Name,Precursor Ion Name,Retention Time,Area,Background,Height,Mass Error PPM,Protein,Precursor Mz
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Acetyl CoA,10.71,5463495,0,160480,1.3,Internal Standard,810.125208
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Acetyl CoA,10.67,5201836,0,166007,0.7,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Acetyl CoA,11.16,1560441,0,81530,1.3,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Acetyl CoA,11.17,518460,0,60756,-0.1,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Acetyl CoA,11.12,220134,0,24040,-0.3,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Acetyl CoA,11.15,367613,0,49449,0.6,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Acetyl CoA,11.09,62957,0,22602,1.3,Internal Standard,810.125208
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Acetyl CoA,11.73,72014,0,20098,-0.1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Acetyl CoA,11.13,1239774,0,60283,1.3,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Acetyl CoA,11.88,354350,0,26341,0.9,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Acetyl CoA,12.13,219370,0,23609,-1.1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Acetyl CoA,11.68,1631465,0,81468,1.1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Acetyl CoA,11.58,1067335,0,60041,0.5,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Acetyl CoA,11.43,374950,0,28872,0,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Acetyl CoA,11.08,1502729,0,85933,1.1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Acetyl CoA,11.32,1321961,0,69125,0.4,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Acetyl CoA,12.1,1192412,0,62777,0.6,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Acetyl CoA,11.62,1656931,0,83048,1.1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Acetyl CoA,11.57,695700,0,47274,1,Internal Standard,810.125208
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Acetyl CoA,11.96,292032,0,26278,0.3,Internal Standard,810.125208
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Taurine,10.27,41264504,0,3527490,-8,Internal Standard,128.032495
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Taurine,10.28,42819340,0,3456462,-8.1,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Taurine,11.13,7708870,0,1158887,-8.4,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Taurine,11.23,6421168,0,820030,-8.5,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Taurine,11.17,4485625,0,602526,-8.5,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Taurine,11.05,6749315,0,986656,-8.3,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Taurine,11.08,4215803,0,604642,-8.4,Internal Standard,128.032495
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Taurine,11.08,4516916,0,620787,-8.7,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Taurine,11.11,9197545,0,1304914,-8,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Taurine,11.19,4873348,0,678843,-8.4,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Taurine,11.2,4582887,0,661873,-8.6,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Taurine,11.13,7600194,0,1167497,-8.4,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Taurine,11.21,6727026,0,896448,-8.9,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Taurine,11.21,6110634,0,877139,-8.5,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Taurine,11.16,8982418,0,1390815,-8.3,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Taurine,11.26,6824087,0,848977,-8.9,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Taurine,11.22,6956417,0,956134,-8.9,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Taurine,11.05,13615174,0,1985020,-8.2,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Taurine,11.2,5727670,0,848815,-8.6,Internal Standard,128.032495
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Taurine,11.27,5006827,0,608736,-8.6,Internal Standard,128.032495
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Sulfoacetic Acid,13.97,25830228,0,2412073,-7,Internal Standard,140.977378
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Sulfoacetic Acid,13.99,25611406,0,2197137,-7,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Sulfoacetic Acid,13.97,22535558,0,5058234,-7.1,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Sulfoacetic Acid,14.35,28621168,0,7279455,-7.9,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Sulfoacetic Acid,14.32,26599046,0,7383673,-7.5,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Sulfoacetic Acid,14.11,15344233,0,3065836,-7.2,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Sulfoacetic Acid,14.42,15127127,0,3741425,-7.6,Internal Standard,140.977378
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Sulfoacetic Acid,14.33,15137618,0,3567223,-7.6,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Sulfoacetic Acid,13.91,24354178,0,5640098,-6.9,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Sulfoacetic Acid,14.38,25410260,0,7016700,-7.6,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Sulfoacetic Acid,14.38,24966640,0,6849350,-7.5,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Sulfoacetic Acid,14.02,25558652,0,5112088,-7.1,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Sulfoacetic Acid,14.24,28389326,0,5219282,-7.3,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Sulfoacetic Acid,14.37,28702180,180216,6482193,-7.5,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Sulfoacetic Acid,14.08,23361890,0,5179734,-7.1,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Sulfoacetic Acid,14.29,26321346,0,5190385,-7.6,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Sulfoacetic Acid,14.33,27059280,0,5280990,-7.7,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Sulfoacetic Acid,14.18,30294406,0,5707956,-7,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Sulfoacetic Acid,14.4,26319918,0,6555553,-7.6,Internal Standard,140.977378
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Sulfoacetic Acid,14.37,23257950,0,6628515,-7.7,Internal Standard,140.977378
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Succinic Acid,12.32,81622488,0,9860823,-6.4,Internal Standard,121.04444
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Succinic Acid,12.31,69162232,0,9266175,-6.1,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Succinic Acid,12.72,63323968,0,4640203,-6.2,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Succinic Acid,14.17,1502306,0,114887,-6.6,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Succinic Acid,14.06,4809341,0,114023,-6.4,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Succinic Acid,12.67,30296706,0,5213991,-7,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Succinic Acid,12.9,4023953,0,1836803,-5.6,Internal Standard,121.04444
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Succinic Acid,13.17,2255513,0,107695,-6.1,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Succinic Acid,12.57,72373376,0,9874302,-8.1,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Succinic Acid,13.54,1361787,0,117077,-6.3,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Succinic Acid,13.12,5664278,0,1407178,-7.2,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Succinic Acid,12.65,49277848,0,9415960,-6.5,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Succinic Acid,11.41,4642369,0,120231,-6.4,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Succinic Acid,12.87,3397126,0,380965,-6.9,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Succinic Acid,12.7,35343336,0,2438466,-7.1,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Succinic Acid,13.66,1680143,0,475882,-7,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Succinic Acid,11.54,3862895,0,115493,-6.4,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Succinic Acid,12.76,80048072,0,8018427,-8.1,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Succinic Acid,14,2861037,0,134125,-6.1,Internal Standard,121.04444
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Succinic Acid,11.27,3708345,0,122360,-6.7,Internal Standard,121.04444
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Cysteic Acid,12.18,8035311,0,724281,-4.3,Internal Standard,171.016047
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Cysteic Acid,12.2,8135601,0,738789,-4.5,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Cysteic Acid,12.78,6746020,0,804385,-4.5,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Cysteic Acid,13.08,5446138,0,570900,-5,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Cysteic Acid,12.98,4686223,0,487466,-4.9,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Cysteic Acid,12.67,3256386,0,355072,-4.4,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Cysteic Acid,12.96,2670302,0,259203,-4.9,Internal Standard,171.016047
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Cysteic Acid,12.82,2734176,0,303466,-5.1,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Cysteic Acid,12.65,6675874,0,825265,-4.3,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Cysteic Acid,13.1,4501935,0,537391,-4.7,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Cysteic Acid,13.18,4357166,0,512809,-4.7,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Cysteic Acid,12.76,7214083,0,839968,-4.5,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Cysteic Acid,13,7440137,0,744153,-4.9,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Cysteic Acid,13.11,5760049,0,608723,-4.8,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Cysteic Acid,12.9,6775156,0,767002,-4.5,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Cysteic Acid,13.09,7040132,0,775722,-4.8,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Cysteic Acid,13.15,6611716,0,737285,-4.9,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Cysteic Acid,12.78,6632554,0,705982,-4.4,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Cysteic Acid,13.1,4908324,0,534693,-5.1,Internal Standard,171.016047
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Cysteic Acid,13.14,4530352,0,505519,-4.8,Internal Standard,171.016047
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Sulfolactic Acid,13.52,5108885,0,499199,-4.3,Internal Standard,171.991297
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Sulfolactic Acid,13.5,5903855,0,563983,-4.3,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Sulfolactic Acid,13.78,6216591,0,782009,-4.3,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Sulfolactic Acid,14.15,4252802,0,516521,-4.8,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Sulfolactic Acid,14.07,3947163,0,418045,-4.5,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Sulfolactic Acid,13.88,2539361,0,313829,-4.6,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Sulfolactic Acid,14.1,1888863,0,203342,-4.8,Internal Standard,171.991297
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Sulfolactic Acid,14.03,1862514,0,218529,-4.5,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Sulfolactic Acid,13.74,5965312,0,668588,-4.1,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Sulfolactic Acid,14.13,3299144,0,391360,-4.8,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Sulfolactic Acid,14.15,3128051,0,350543,-4.7,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Sulfolactic Acid,13.83,6662708,0,732579,-4.4,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Sulfolactic Acid,14.03,6896885,0,675805,-4.6,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Sulfolactic Acid,14.12,4373594,0,499883,-4.7,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Sulfolactic Acid,13.91,5874743,0,639053,-4.3,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Sulfolactic Acid,14.08,6252734,0,655286,-4.8,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Sulfolactic Acid,14.14,6497077,0,709809,-5.1,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Sulfolactic Acid,13.89,6165803,0,691571,-4.1,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Sulfolactic Acid,14.17,3869220,0,428059,-4.8,Internal Standard,171.991297
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Sulfolactic Acid,14.15,3326468,0,394375,-5,Internal Standard,171.991297
+Internal Standard,170410_Blk_FilterBlk_A,Heavy Isotheonic Acid,6.29,49468068,0,1969144,-8.3,Internal Standard,126.998113
+Internal Standard,170410_Blk_FilterBlk_B,Heavy Isotheonic Acid,6.21,49614956,29112,2019634,-8.5,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy Isotheonic Acid,6,25721664,0,600077,-8.5,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy Isotheonic Acid,6.16,11057744,0,545199,-6.5,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy Isotheonic Acid,6.03,21070622,0,610418,-8.4,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy Isotheonic Acid,6.12,13045646,0,356513,-8.1,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy Isotheonic Acid,6.22,11265538,0,338920,-8,Internal Standard,126.998113
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy Isotheonic Acid,6.12,10908434,0,339176,-8.1,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy Isotheonic Acid,5.95,27830500,0,695685,-8.3,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy Isotheonic Acid,6.2,16763812,0,527805,-7.3,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy Isotheonic Acid,6.14,21268622,0,503636,-8.3,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy Isotheonic Acid,6,28440756,0,707443,-8.5,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy Isotheonic Acid,6.17,19171596,0,618423,-8.3,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy Isotheonic Acid,6.18,19017064,0,625454,-7.7,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy Isotheonic Acid,6.09,26777462,0,610258,-8.4,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy Isotheonic Acid,6.18,16733787,0,495611,-7.8,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy Isotheonic Acid,6.28,8395004,0,535551,-6.3,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy Isotheonic Acid,6.28,29138168,0,712605,-8.6,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy Isotheonic Acid,6.21,14924169,0,523942,-8,Internal Standard,126.998113
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy Isotheonic Acid,6.26,7571434,0,375756,-6.4,Internal Standard,126.998113
+Internal Standard,170410_Blk_FilterBlk_A,Heavy AMP,11.74,54200212,384169,3572285,1.5,Internal Standard,351.040983
+Internal Standard,170410_Blk_FilterBlk_B,Heavy AMP,11.73,53820140,655474,3506545,1.3,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy AMP,12.18,37942248,0,1951407,1.2,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy AMP,12.8,25338040,0,1191891,0.8,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy AMP,12.84,23307554,0,1057186,0.7,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy AMP,12.32,18815788,0,1078908,1.3,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy AMP,12.81,12231294,0,576151,1,Internal Standard,351.040983
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy AMP,12.77,13899177,0,645376,0.9,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy AMP,12.02,37648228,0,1664545,1.5,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy AMP,12.9,21595110,0,982115,1,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy AMP,12.98,19186332,0,857227,1,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy AMP,12.23,38655492,0,1992928,1.2,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy AMP,12.64,32480674,0,1606819,0.9,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy AMP,12.84,26021974,0,1175459,0.9,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy AMP,12.32,34454976,0,1674920,1.2,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy AMP,12.76,32353604,0,1386633,0.7,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy AMP,12.84,31856148,0,1389066,0.7,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy AMP,12.35,39572244,0,1942850,1.4,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy AMP,12.9,29353428,0,1282247,0.7,Internal Standard,351.040983
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy AMP,12.88,21260856,2998004,1019551,0.9,Internal Standard,351.040983
+Internal Standard,170410_Blk_FilterBlk_A,Heavy GMP,13.89,10923326,0,860859,1.1,Internal Standard,367.035898
+Internal Standard,170410_Blk_FilterBlk_B,Heavy GMP,13.91,10963848,0,915239,1.1,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsFull_1,Heavy GMP,14.93,1161680,0,74274,0.6,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsFull_2,Heavy GMP,15.05,2904630,0,182532,0.1,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsFull_3,Heavy GMP,15.15,2381257,0,120465,0.4,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsHalf_1,Heavy GMP,14.72,330964,0,49133,0.1,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsHalf_2,Heavy GMP,15.05,1032055,0,103836,0.5,Internal Standard,367.035898
+Internal Standard,170410_Poo_April11AqExtractsHalf_3,Heavy GMP,14.9,1324963,0,108576,0.5,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-125m_A,Heavy GMP,14.21,1321003,0,77203,0.2,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-125m_B,Heavy GMP,15.08,2211804,0,122071,0.1,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-125m_C,Heavy GMP,15.24,1823163,0,106080,0.4,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-15m_A,Heavy GMP,14.79,1723247,0,106590,0.5,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-15m_B,Heavy GMP,15.01,2322011,0,149121,0.2,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-15m_C,Heavy GMP,15.07,3386154,0,175807,0.4,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-45m_A,Heavy GMP,14.74,2170337,0,118740,0.4,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-45m_B,Heavy GMP,15.2,3015081,0,165987,-0.2,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-45m_C,Heavy GMP,15.12,3152770,0,176695,0.2,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-75m_A,Heavy GMP,14.62,3051946,0,159522,0.4,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-75m_B,Heavy GMP,15.02,4127273,0,193813,0.1,Internal Standard,367.035898
+Internal Standard,170410_Smp_KM1513-75m_C,Heavy GMP,15.15,2876483,0,135509,0.3,Internal Standard,367.035898
