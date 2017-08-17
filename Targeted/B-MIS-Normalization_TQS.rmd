@@ -1,7 +1,7 @@
 ---
 title: "Best Matched Internal Standard for Targeted TQS Data"
 author: "Boysen and Heal et al"
-date: "August 1, 2017"
+date: "August 17, 2017"
 output:
   pdf_document: default
   html_document: default
@@ -446,7 +446,7 @@ dattoplot <- dattoplot%>%
   rbind(IStoplot)
 
 
-ggplot(dat = dattoplot, 
+g <- ggplot(dat = dattoplot, 
             aes (x = `Retention Time`, y = Parent, 
                      text = Compound.Name))+
   geom_point(aes(fill = PooPlusModel.IS, color = type),
@@ -458,6 +458,6 @@ ggplot(dat = dattoplot,
              colour = "black", size = 5) +
   theme(legend.text=element_text(size=8))
 
-
+g
 ```
 
