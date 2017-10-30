@@ -1,7 +1,7 @@
 ---
 title: "Best Matched Internal Standard for Targeted TQS Data"
 author: "Boysen and Heal et al"
-date: "August 17, 2017"
+date: "October 30, 2017"
 output:
   pdf_document: default
   html_document: default
@@ -17,7 +17,6 @@ library(Hmisc)
 library(gtools)
 library(cowplot)
 require(RColorBrewer)
-library(xlsx)
 library(readr)
 library(plotly)
 library(stringr)
@@ -29,11 +28,23 @@ library(dplyr)
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 filename <- "QC_outputExampleSkylineOutput.csv"
 mydata.overloaded <- read_csv(filename,comment = "#")
+overloaded <- mydata.overloaded%>%
+     filter(grepl("over", Notes)) %>%
+     group_by(Compound.Name) %>%
+     summarise(n = n()) %>%
+     filter(n>9)
+overloaded$Compound.Name
 mydata <- mydata.overloaded %>% select(Replicate.Name:S.N) %>% 
-  filter(!Notes %in% c("Standards"))
+  filter(!Notes %in% c("Standards")) %>%
+     filter(Compound.Name != "Arginine",
+            Compound.Name != "Betaine",
+            Compound.Name != "DHPS",
+            Compound.Name != "DMPS",
+            Compound.Name != "Glutamic acid",
+            Compound.Name != "Proline")
 glimpse(mydata)
 
-sample.key <- read.csv("sample.key.targeted.csv")
+sample.key <- read.csv("sample.key.targeted.csv", as.is=T)
 glimpse(sample.key)
 
 MasterList <- "HILIC_MasterList_Example.csv"
@@ -199,6 +210,58 @@ dat <- dat %>% select(-Compound)
 print(dat %>% select(runDate:replicate) %>% unique)
 ```
 
+
+#Make some BMIS evaluations here based on the Internal Standards
+Make a list of the internal standards, - the MIS, and RSD of pooled, RSD of smp for that internal standard
+```{r}
+cut.off <- 0.4
+dat2 <- dat %>%
+  filter(Compound.Name %in% IS.means$Compound.Name) %>%
+  select(-(Compound.Name:replicate))  %>%
+  select(-(Replicate.Name))  %>%
+  gather(key = "MIS", value = "Adjusted_Area",
+         factor_key = TRUE, -Run.Cmpd) %>%
+  left_join(dat %>% select(type, Compound.Name, Run.Cmpd)) %>%
+  mutate(Adjusted_Area = as.numeric(Adjusted_Area))
+
+smpdat <- dat2 %>%
+  filter(type == "Smp")%>%
+  group_by(Compound.Name, MIS) %>%
+  summarise(RSD_ofSmp = sd(Adjusted_Area)/mean(Adjusted_Area))
+
+alldat <- dat2 %>%
+  filter(type == "Poo")%>%
+  group_by(Compound.Name, MIS) %>%
+  summarise(RSD_ofPoo = sd(Adjusted_Area)/mean(Adjusted_Area)) %>%
+  left_join(smpdat)
+
+injectONlY <- alldat %>%
+  filter(MIS == "inj.vol.Norm.Area" ) %>%
+  mutate(Orig_RSD = RSD_ofPoo)%>%
+  mutate(OrigSamp_RSD = RSD_ofSmp)%>%
+  select(-RSD_ofPoo, -RSD_ofSmp, -MIS)
+
+injectONlY_toPlot <- alldat %>%
+  filter(MIS == "inj.vol.Norm.Area" ) 
+
+newalldat <- left_join(alldat, injectONlY,by = "Compound.Name") %>%
+  mutate(del_RSD = ( Orig_RSD - RSD_ofPoo),
+         percentDiff = del_RSD/Orig_RSD) %>%
+  mutate(accept_MIS = (percentDiff > cut.off)) #%>%
+ # filter(OrigSamp_RSD <=  RSD_ofSmp)
+
+this.filename <- paste("IntStd.as.Analyte.data.",filename, sep="")
+write.csv(newalldat, this.filename)
+
+g <- ggplot()+
+  geom_point(dat = newalldat, aes(x = RSD_ofPoo, y = RSD_ofSmp, colour = accept_MIS))+
+  geom_point(dat = injectONlY_toPlot, aes(x = RSD_ofPoo, y = RSD_ofSmp), size = 3) +
+  facet_wrap(~ Compound.Name)
+
+g
+ggsave("IntStd.as.Analytes.pdf", plot=g, scale = 2)
+```
+
 #Compare normalizations
 Get mean, sd, and rsd for each normalization of each compound for each sample type.
 Output is a dataframe called 'rsd.stats'
@@ -220,35 +283,76 @@ glimpse(rsd.stats)
 ```
 
 ##Cleanup RSD data and add a minimizing column 
-One based on the multiple injetions of the pooled sample "PooModel"
-and one based on the injections of the biological replicates of samples "SmpModel"
+Based on the multiple injetions of the pooled sample "PooModel"
+Pick a the internal standard that best nonrmalizes the data using the redution 
+in the rsd of the pooled as a way to evaluate the noramlization.
+Use a cutoff value - the BMIS must improve the rsd of the raw data by 40% in 
+order to be selected for consideration. 
+(ie [RSD of pooled after normalization - raw pooled RSD]/raw pooled RSD > 0.4)
+If it wasn't detected in the pooled samples, default to raw data
 ```{r,  error = FALSE, warning=FALSE, message=FALSE}
+cutoff = 0.4
+low.cutoff <- 0.1
+
 rsd.clean <- rsd.stats %>% filter(!is.na(m)) %>%
      filter(Normer!="Area")
-SmpModel <- rsd.clean %>% filter(type=="Smp") %>%
-     select(-m, -sd) %>%
-     group_by(Compound.Name, Normer) %>%
-     summarise(Mean.rsd = mean(rsd, na.rm=T)) %>%
-     summarise(SmpModelRSD = min(Mean.rsd),
-               Smp.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
-PooModel <- rsd.clean %>% filter(type=="Poo") %>%
-     select(-m, -sd) %>%
+RawData.Variability <- rsd.clean %>%
+     filter(Normer=="inj.vol.Norm.Area",
+            type=="Poo",
+         !is.na(rsd)) %>%
+     rename(raw_rsd = rsd) %>% ungroup() %>%
+     select(Compound.Name, raw_rsd)
+rsd.more <- full_join(rsd.clean, RawData.Variability, by = "Compound.Name") %>%
+     mutate(del_poo = raw_rsd - rsd,
+            percent_diff = del_poo/raw_rsd) %>%
+     filter(raw_rsd > low.cutoff)
+
+PooModel <- rsd.more %>% filter(type=="Poo") %>%
+     filter(percent_diff > cutoff) %>%
+     select(-m, -sd, -del_poo, -percent_diff) %>%
      group_by(Compound.Name, Normer) %>%
      summarise(Mean.rsd = mean(rsd, na.rm=T)) %>%
      summarise(PooModelRSD = min(Mean.rsd),
                Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)][1])
-Models <- full_join(PooModel, SmpModel)
-glimpse(Models)
+glimpse(PooModel)
+
+Models <- full_join(Compds.detect, PooModel, by = "Compound.Name") %>%
+     select(-percent.present) %>%
+     mutate(Poo.Picked.IS = ifelse(is.na(Poo.Picked.IS),
+                                   "inj.vol.Norm.Area",
+                                   Poo.Picked.IS))
 
 rsd.total <- full_join(rsd.stats, Models) %>%
      filter(!is.na(Compound.Name))
 ```
 
+
+## Write out a file with the AMIS (aceptable matched internal standards)
+```{r error = FALSE, warning=FALSE, message=FALSE}
+rsd.more <- full_join(rsd.clean, RawData.Variability, by = "Compound.Name") %>%
+     mutate(del_poo = raw_rsd - rsd,
+            percent_diff = del_poo/raw_rsd) %>%
+     filter(raw_rsd > low.cutoff)
+AMIS.long <- rsd.more %>%
+     ungroup() %>%
+     filter(percent_diff > cutoff,
+            type =="Poo") %>%
+     select(Compound.Name, Normer, rsd) %>%
+     arrange(Compound.Name , rsd) 
+AMIS.short <- AMIS.long%>%
+     group_by(Compound.Name) %>%
+     summarise(IS.Options = paste(Normer, collapse=";"))
+glimpse(AMIS.short)
+
+AMIs.file <- paste0("AMIS.",filename,sep="")
+write.csv(AMIS.short, AMIs.file)
+```
+
 #Adjust the pooled model --> PooPlus model aka B-MIS model
-Force BMIS to normalizes metabolites that we have internal standards for to the appropriate internal standard. Otherwise keeps the pooled model. 
+Force BMIS to normalize metabolites that we have internal standards for to the appropriate internal standard. 
 Otherwise uses the PooModel for all compounds detected in the Pooled samples.
-If a compound was detected in the sample but not the pooled then use the SmpModel.
 Names this new complied model "PooPlus" (aka B-MIS)
+
 Output of this section is 'rsd.total': A dataframe with mean, sd, and rsd for each compound, sample type, and normalization combination and a column indicating the poo, smp and pooPlus (B-MIS) internal standard selections 
 ```{r error = FALSE, warning=FALSE, message=FALSE}
 rsd.total <- rsd.total %>%
@@ -260,22 +364,14 @@ for (i in 1:nrow(rsd.total)){
      if(length(grep(cmpd, IS.list))>0){
           newIS <- paste0(IS.list[grep(cmpd, IS.list)],".Norm.Area")
           rsd.total$PooPlus.IS[i] <- newIS
-          
-     }
-     ## if the poo didn't pick a normalizing IS, use the samp picked one
-     if(is.na(rsd.total$Poo.Picked.IS[i]) &
-        !is.na(rsd.total$Smp.Picked.IS[i])){
-          rsd.total$PooPlus.IS[i] <- rsd.total$Smp.Picked.IS[i]
-          rsd.total$PooPlusModelRSD[i] <-
-               rsd.total$SmpModelRSD[i]
      }
 }
 
 rsd.total <- rsd.total %>% 
-     select(-PooModelRSD,-PooPlusModelRSD,-SmpModelRSD)
+     select(-PooModelRSD,-PooPlusModelRSD)
 glimpse(rsd.total)
-#write.csv(rsd.total, "New_All_normalization_rsd_dat.csv") #Uncomment if you'd like to write out the RSD data
-
+this.file <- paste(Sys.Date(),"All_normalization_rsd_dat",filename,sep="_")
+write.csv(rsd.total, this.file) #Uncomment if you'd like to write out the RSD data
 ```
 
 #Get Adjusted areas after choosing a BMIS
@@ -295,14 +391,15 @@ for (i in 1:length(split.dat.join)){
   split.dat.join[[i]]$PooPlusModel <- split.dat.join[[i]][,col.key]
 }
 
-unsplit.dat.join <- do.call(rbind, split.dat.join)
+unsplit.dat.join <- do.call(rbind, split.dat.join) %>%
+     rename(BMISNormalizedArea = PooPlusModel,
+            BMIS.IS = PooPlusModel.IS)
 glimpse(unsplit.dat.join)
 
-new.filename <- paste("New_Normalized_data",filename,sep="_")
+new.filename <- paste(Sys.Date(),"New_Normalized_data",filename,sep="_")
 write.csv(unsplit.dat.join, new.filename)
 print(paste("Your BMIS results are saved as", new.filename))
-print("The output of the B-MIS normalized data is in the column named PooPlusModel.")
-
+print("The output of the B-MIS normalized data is in the column named BMISNormalizedArea.")
 ```
 
 
@@ -310,7 +407,7 @@ print("The output of the B-MIS normalized data is in the column named PooPlusMod
 You need to have run BMIS and have rsd.total from the BMIS results
 And you need the IS.list
 This might take a bit...a few minutes
-```{r Do we have enough Internal Standards?, error=FALSE, message=FALSE, fig.width=8, fig.height=8}
+```{r Do we have enough Internal Standards?, eval = FALSE, error=FALSE, message=FALSE, fig.width=8, fig.height=8}
 BMIS_sensResults <- list()
 
 Overloaded <- unsplit.dat.join  %>%      
@@ -419,7 +516,7 @@ BMIS_sensResults[[3]]
 
 #Plot to look at which BMIS was chosen
 Requires unsplit.data.join
-```{r ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
+```{r whichBMIS-RTvMZ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=6}
 Parent <- read_csv(MasterList) %>%
   mutate(Compound.Name = `Compound Name`) %>%
   select(Compound.Name, Parent, `Retention Time`) %>%
@@ -427,8 +524,8 @@ Parent <- read_csv(MasterList) %>%
 
 
 dattoplot <- unsplit.dat.join %>%
-  select(Compound.Name, PooPlusModel.IS) %>%
-  filter(!is.na(PooPlusModel.IS)) %>%
+  select(Compound.Name, BMIS.IS) %>%
+  filter(!is.na(BMIS.IS)) %>%
   left_join(Parent) %>%
   unique()
 
@@ -437,11 +534,11 @@ IStoplot <- dattoplot %>%
   mutate(type = "IS")
 
 NoBMIStoplot <-dattoplot %>%
-  filter(PooPlusModel.IS == "inj.vol.Norm.Area")
+  filter(BMIS.IS == "inj.vol.Norm.Area")
 
 dattoplot <- dattoplot%>%
   filter(!Compound.Name %in% IS.cat$`Compound Name`)%>%
-  filter(!PooPlusModel.IS == "inj.vol.Norm.Area") %>%
+  filter(!BMIS.IS == "inj.vol.Norm.Area") %>%
   mutate(type = "analyte") %>%
   rbind(IStoplot)
 
@@ -449,7 +546,7 @@ dattoplot <- dattoplot%>%
 g <- ggplot(dat = dattoplot, 
             aes (x = `Retention Time`, y = Parent, 
                      text = Compound.Name))+
-  geom_point(aes(fill = PooPlusModel.IS, color = type),
+  geom_point(aes(fill = BMIS.IS, color = type),
                  pch=21, size = 5, alpha = 0.6) + 
   annotate("text", x = mean(range(dattoplot$`Retention Time`)),  y = max(dattoplot$Parent),  label= "Black dots are where no BMIS were selected")+
   scale_colour_manual(values=c("white", "black"))+
