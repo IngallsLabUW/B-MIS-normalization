@@ -1,7 +1,7 @@
 get---
 title: "QE.XCMS.CyanoAq.TM2P.Diatoms.BMIS"
 author: "Angie Boysen"
-date: "Feb 9, 2017"
+date: "October 30, 2017"
 output: html_document
 ---
 
@@ -15,7 +15,6 @@ library(Hmisc)
 library(gtools)
 library(cowplot)
 require(RColorBrewer)
-# library(xlsx)
 library(readr)
 library(plotly)
 library(stringr)
@@ -125,7 +124,9 @@ head(IS.means)
 ```
 
 #Normalize to each internal Standard
-Adjust peak areas to each internal standard.  Output is a dataframe 'area.norm' that has each peak adjusted to each possible internal standards
+Actually scaling/adjusting by dividing by IS peak area and multiplying by the average IS peak area.
+Output is a dataframe 'area.norm' that has each peak adjusted
+to each possible internal standards
 ```{r, error = FALSE, warning=FALSE, message=FALSE}
 binded <- rbind(IS.dat, xcms.long)
 wArea<- binded %>% 
@@ -185,75 +186,180 @@ binded <- binded %>% mutate(Run.Cmpd = paste(Replicate.Name, MassFeature))
 
 dat <- full_join(binded, mydata_new)
 print(dat %>% select(runDate:replicate) %>% unique)
+# write.csv(dat, "IS.data.csv")
 ```
 
-##Compare normalizations
-Get mean, sd, and rsd for each normalization of each compound for each sample type.
-Output is a dataframe called 'rsd.stats'
-```{r, error = FALSE, warning=FALSE, message=FALSE}
-no.blank.dat <- dat %>% filter(type =="Smp" | type =="Poo") 
+#Make a list of the internal standards, - the MIS, and RSD of pooled, RSD of smp for that
+```{r}
+cut.off <- 0.4
 
-rsd.stats <- no.blank.dat %>% select(-Replicate.Name,  -Run.Cmpd,
-                                     -runDate, -replicate) %>%
-     gather(Normer, Value, -MassFeature, -type, - SampID) %>%
-     group_by(MassFeature, type, SampID, Normer) %>%
-     summarise(m = mean(Value, na.rm=T), 
-                sd = sd(Value, na.rm=T), rsd = sd/m)
-glimpse(rsd.stats)
+dat2 <- dat %>%
+  filter(MassFeature %in% IS.dat$MassFeature) %>%
+  select(-(Area:MassFeature))  %>%
+  select(-(runDate:replicate)) %>%
+  gather(key = "MIS", value = "Adjusted_Area", factor_key = TRUE, -Run.Cmpd) %>%
+  left_join(dat %>% select(type, MassFeature, Run.Cmpd)) %>%
+  mutate(Adjusted_Area = as.numeric(Adjusted_Area))
+
+smpdat <- dat2 %>%
+  filter(type == "Smp")%>%
+  group_by(MassFeature, MIS) %>%
+  summarise(RSD_ofSmp = sd(Adjusted_Area)/mean(Adjusted_Area))
+
+alldat <- dat2 %>%
+  filter(type == "Poo")%>%
+  group_by(MassFeature, MIS) %>%
+  summarise(RSD_ofPoo = sd(Adjusted_Area)/mean(Adjusted_Area)) %>%
+  left_join(smpdat)
+
+injectONlY <- alldat %>%
+  filter(MIS == "Inj_vol.Norm.Area" ) %>%
+  mutate(Orig_RSD = RSD_ofPoo)%>%
+  select(-RSD_ofPoo, -RSD_ofSmp, -MIS)
+
+injectONlY_toPlot <- alldat %>%
+  filter(MIS == "Inj_vol.Norm.Area" ) 
+
+newalldat <- left_join(alldat, injectONlY) %>%
+  mutate(del_RSD = ( Orig_RSD - RSD_ofPoo),
+         percRSD = del_RSD/Orig_RSD) %>%
+  mutate(accept_MIS = (percRSD > cut.off))
+
+write.csv(newalldat,  "IS_testResults.csv")
+
+
+
+g <- ggplot()+
+  geom_point(dat = newalldat, aes(x = RSD_ofPoo, y = RSD_ofSmp, colour = accept_MIS))+
+  geom_point(dat = injectONlY_toPlot, aes(x = RSD_ofPoo, y = RSD_ofSmp), size = 2) +
+  facet_wrap(~MassFeature)
+
+g
+
+ggsave("IS_experiment.pdf", plot = g, device = "pdf", width = 10, height = 10, units = "in")
 ```
 
-#Cleanup RSD data and add a minimizing column, get the BMIS of each MassFeature (PooPlusIS)
-One based on the multiple injetions of the pooled sample "PooModel"
-```{r error = FALSE, warning=FALSE, message=FALSE}
-rsd.clean <- rsd.stats %>% filter(!is.na(m))  %>%
-     filter(Normer!="Area")
 
-PooModel <- rsd.clean %>% filter(type=="Poo") %>%
-     select(-m, -sd) %>%
-     group_by(MassFeature, Normer) %>%
-     summarise(Mean.rsd = mean(rsd, na.rm=T)) %>%
-     summarise(PooModelRSD = min(Mean.rsd),
-               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)][1])
-Models <- PooModel
-glimpse(Models)
+#Make a summary of which internal standards were conidsterd "Acceptable" and "Best" Matching Internal Standards
+```{r}
+## This dataset is all MFs normalized to all ISs
+# dat <- read_csv("IS_data.csv")%>%
+#   select(-X1)
 
-rsd.total <- full_join(rsd.stats, Models) %>%
-       mutate(PooPlusModelRSD = PooModelRSD)%>%
-  mutate(PooPlus.IS = Poo.Picked.IS)
+#Makes data Long
+longdat <- dat %>%
+  select(-(Area:MassFeature))  %>%
+  select(-(runDate:replicate)) %>%
+  gather(key = "MIS", value = "Adjusted_Area", factor_key = TRUE, -Run.Cmpd) %>%
+  left_join(dat %>% select(type, MassFeature, Run.Cmpd)) %>%
+  mutate(Adjusted_Area = as.numeric(Adjusted_Area))
 
-rsd.total <- rsd.total %>% 
-     select(-PooModelRSD,-PooPlusModelRSD)
-glimpse(rsd.total)
+#Look only the Pooled samples, to get a lowest RSD of the pooled possible (RSD_ofPoo), then choose which IS reduces the RSD the most (Poo.Picked.IS)
+poodat <- longdat %>%
+  filter(type == "Poo")%>%
+  group_by(MassFeature, MIS) %>%
+  summarise(RSD_ofPoo =  sd(Adjusted_Area)/mean(Adjusted_Area))
+poodat <- poodat %>% left_join(poodat %>%
+                                 group_by(MassFeature) %>%
+                                 summarise(Poo.Picked.IS = unique(MIS)[which.min(RSD_ofPoo)][1]))
+
+#Get the starting point of the RSD (Orig_RSD), calculate the change in the RSD, say if the MIS is acceptable
+newpoodat <- left_join(poodat, poodat %>%
+                         filter(MIS == "Inj_vol.Norm.Area" ) %>%
+                         mutate(Orig_RSD = RSD_ofPoo) %>%
+                         select(-RSD_ofPoo, -MIS)) %>%
+  mutate(del_RSD = (Orig_RSD - RSD_ofPoo)) %>%
+  mutate(percentChange = del_RSD/Orig_RSD) %>%
+  mutate(accept_MIS = (percentChange > 0.4 & Orig_RSD > 0.1))  #HERE IS WHERE WE NEED TO DEFINE WHAT MAKES AND ACCEPTABLE MATCHED INTERNAL STANDARD
+
+#Change the BMIS to "Inj_vol.Norm.Area" if the BMIS is not an acceptable - Adds a column that has the BMIS, not just Poo.picked.IS
+NoAMIS_newpoodat_BMIS <- newpoodat %>%
+  filter(MIS == Poo.Picked.IS) %>% #Pulling out just the pooplus is matches
+  filter(accept_MIS == "FALSE") %>%
+  mutate(FinalBMIS = "Inj_vol.Norm.Area") 
+
+newpoodat_BMIS <- newpoodat %>%
+              filter(MIS == Poo.Picked.IS) %>% 
+              filter(accept_MIS == "TRUE") %>%
+              mutate(FinalBMIS = Poo.Picked.IS) %>%
+  bind_rows(NoAMIS_newpoodat_BMIS)
+
+#Makes the full dataset from the fixed ones (where there is no AMIS)
+FullDat_fixed <- left_join(newpoodat, newpoodat_BMIS %>%
+                        select(MassFeature, FinalBMIS)) 
+FullDat_fixed <- FullDat_fixed %>% left_join(FullDat_fixed %>%
+              filter(FinalBMIS == MIS) %>%
+              mutate(FinalRSD = RSD_ofPoo) %>%
+              select(MassFeature, FinalRSD))
+
+#Only get MFs with FinalRSD < 0.2
+Good_MFs <- FullDat_fixed %>%
+  filter(MIS == Poo.Picked.IS) %>%
+  filter(FinalRSD < 0.2)
+
+#Get number of mass features
+MassFeatures <- length(Good_MFs$MassFeature)
+print("Total mass features")
+print(MassFeatures)
+
+ #This will give us the number of mass features that were picked as a BMIS for each IS
+BMIS_percent <- Good_MFs %>%
+  filter(FinalBMIS != "Inj_vol.Norm.Area") %>%
+  group_by(FinalBMIS) %>%
+  summarise(MFs = n()) %>%
+  mutate(PercentofBMIS = MFs/MassFeatures)  
+
+BMIS_Summary2 <- Good_MFs %>%
+  filter(FinalBMIS != "Inj_vol.Norm.Area")
+MassFeatures2 <- length(BMIS_Summary2$MassFeature)
+print("Mass features with BMIS")
+print(MassFeatures2)
+
+
+#This will give us the number of mass features that were picked as an AMIS for each IS
+AMIS_percent <- FullDat_fixed %>%
+  filter(MassFeature %in% Good_MFs$MassFeature) %>%
+  filter(accept_MIS == "TRUE") %>%
+  group_by(FinalBMIS) %>%
+  summarise(MFs = n()) %>%
+  mutate(PercentofAMIS = MFs/MassFeatures)  #This gives us the % of the MF chosen by each IS 
+
+Summary <- left_join(AMIS_percent %>% select(-MFs), BMIS_percent %>% select(-MFs)) %>%
+  mutate(Originality_Index = PercentofBMIS/PercentofAMIS)
+  
+Summarylong <- left_join(AMIS_percent %>% select(-MFs), BMIS_percent %>%
+                           select(-MFs))%>% 
+  gather(key = "type", value = "Percent", -FinalBMIS)
+
+g <- ggplot() +
+  geom_col(data = Summarylong , aes(x = type, y = Percent))+
+  facet_wrap(~FinalBMIS)
+
+g
+
+# write.csv(Summary, "AMISvsBMIS.csv")
+
+# ggsave("AMISvsBMIS.pdf", plot = g, device = "pdf", width = 10, height = 10, units = "in")
+
 ```
 
-#Get Adjusted areas after choosing a BMIS
-```{r error = FALSE, warning=FALSE, message=FALSE}
-models <- rsd.total %>% ungroup %>%
-     select(MassFeature, PooPlus.IS) %>%
-     group_by(MassFeature) %>%
-     summarise(PooPlusModel.IS = unique(PooPlus.IS))
-dat <- dat %>% filter(!is.na(Replicate.Name))
-dat.join <- as.data.frame(full_join(dat, models)) %>%
-  mutate(PooPlusModel = NA)
 
-split.on.IS <- as.factor(dat.join$PooPlusModel.IS)
-split.dat.join <- split(dat.join, split.on.IS)
-for (i in 1:length(split.dat.join)){
-  col.key <-  which(names(split.dat.join[[i]])==names(split.dat.join)[i])
-  split.dat.join[[i]]$PooPlusModel <- split.dat.join[[i]][,col.key]
-}
+###Get all the data back - and keep only the MF-MIS match set for the BMIS
 
-unsplit.dat.join <- unsplit(split.dat.join, split.on.IS)
-glimpse(unsplit.dat.join)
-
-
+```{r}
+#Add a column to the longdat that has important information from the FullDat_fixed, then only return data that is normalized via B-MIS normalization
+BMIS_normalizedData <- FullDat_fixed %>%
+  filter(MIS == FinalBMIS) %>%
+  select(MassFeature, Orig_RSD, del_RSD, percentChange, FinalBMIS, FinalRSD) %>%
+  right_join(longdat) %>%
+  filter(MIS == FinalBMIS) %>%
+  left_join(., dat %>% select(Run.Cmpd, runDate, type, SampID, replicate))
 
 new.filename <- paste("BMISd",filename,sep="_")
-write.csv(unsplit.dat.join, new.filename)
+write.csv(BMIS_normalizedData, new.filename)
 print(paste("Your BMIS results are saved as", new.filename))
 print("The output of the B-MIS normalized data is in the column named PooPlusModel.")
 ```
-
 
 
 #Senitivity analysis - Do we have enough internal standards?  
@@ -261,10 +367,17 @@ You need to have run BMIS and have rsd.total from the BMIS results
 And you need the IS.list
 This might take a bit...several minutes on a medium-high powered computer
 ```{r Do we have enough Internal Standards?, error=FALSE, message=FALSE, fig.width=8, fig.height=8}
-rsd.sens <- rsd.total %>% 
-  select(`MassFeature`:rsd) %>%
-  filter(!`MassFeature` %in% IS.list) %>%
-  mutate(ISused = Normer %>% str_replace(".Norm.Area", ""))
+
+IS.list <- unique(IS.dat$MassFeature)
+
+FullDat_fixedCulled <- FullDat_fixed %>%
+  filter(FinalRSD < 0.2)
+
+rsd.sens <- FullDat_fixedCulled %>% 
+  select(`MassFeature`:accept_MIS) %>% 
+  select(-Poo.Picked.IS) %>%
+  filter(!`MassFeature` %in% IS.list) %>% #Gets rid of IS as mass features
+  mutate(ISused = MIS %>% str_replace(".Norm.Area", ""))
 
 IS_number <- NA
 BMIS_failed <- as.data.frame(IS_number)
@@ -282,39 +395,40 @@ if (length(ISsublist) > 50) {ISsublist <- sample(ISsublist, 50)}
 for (j in 1:length(ISsublist)){
 ISsubs <- c(ISsublist[[j]], "Inj_vol")
 subrsd <- rsd.sens %>%
-  filter(ISused %in% ISsubs)
-sensPooModel <- subrsd %>% filter(type=="Poo") %>%
-     select(-m, -sd) %>%
-     filter(!is.na(rsd)) %>%
-     group_by(MassFeature, Normer) %>%
-     summarize(Mean.rsd = mean(rsd, na.rm=T)) %>%
-     summarize(PooModelRSD = min(Mean.rsd),
-               Poo.Picked.IS = unique(Normer)[which.min(Mean.rsd)])
-subrsd_sensModels <- full_join(subrsd, sensPooModel, by = "MassFeature") %>%
-  filter(!is.na(MassFeature))%>%
-  mutate(PooPlus.IS = Poo.Picked.IS) %>%
-  mutate(PooPlusModelRSD = PooModelRSD)
+  filter(ISused %in% ISsubs) 
+subrsd <- subrsd %>% left_join(subrsd %>%
+                                 group_by(MassFeature) %>%
+                                 summarise(Poo.Picked.IS = unique(MIS)[which.min(RSD_ofPoo)][1]))
 
-sensfinalmodels <- subrsd_sensModels %>% ungroup %>%
-  select(MassFeature, PooPlus.IS) %>%
-  group_by(MassFeature) %>%
-  summarize(PooPlusModel.IS = unique(PooPlus.IS)) %>%
-  filter(!is.na(PooPlusModel.IS))
+
+#Change the BMIS to "Inj_vol.Norm.Area" if the BMIS is not an acceptable - Adds a column that has the BMIS, not just Poo.picked.IS.  Then newpoodat_BMIS is the final results
+NoAMIS_newpoodat_BMIS <- subrsd %>%
+  filter(MIS == Poo.Picked.IS) %>% #Pulling out just the pooplus is matches
+  filter(accept_MIS == "FALSE") %>%
+  mutate(FinalBMIS = "Inj_vol.Norm.Area",
+         FinalRSD = Orig_RSD)
+
+newpoodat_BMIS <- subrsd %>%
+              filter(MIS == Poo.Picked.IS) %>% 
+              filter(accept_MIS == "TRUE") %>%
+              mutate(FinalBMIS = Poo.Picked.IS,
+                     FinalRSD = RSD_ofPoo) %>%
+  bind_rows(NoAMIS_newpoodat_BMIS)
 
 BMIS_failed_iteration <- BMIS_failed_empty
 BMIS_failed_iteration$IS_number[1] <- i
 BMIS_failed_iteration$Iteration[1] <- j
 
-BMISFail <- sensfinalmodels %>% filter(PooPlusModel.IS == "Inj_vol.Norm.Area")
-BMIS_failed_iteration$Percent_Fail[1] <- length(BMISFail$PooPlusModel.IS)/length(sensfinalmodels$PooPlusModel.IS)
+BMISFail <- newpoodat_BMIS %>% filter(FinalBMIS == "Inj_vol.Norm.Area")
+BMIS_failed_iteration$Percent_Fail[1] <- length(BMISFail$FinalBMIS)/length(newpoodat_BMIS$Poo.Picked.IS)
 
-BMIS_failed_iteration$RSD[1] <- median(sensPooModel$PooModelRSD)
+BMIS_failed_iteration$RSD[1] <- median(newpoodat_BMIS$FinalRSD)###Add final RSD
 BMIS_failed <- rbind(BMIS_failed, BMIS_failed_iteration)
 
 }
 
 }
-
+BMIS_sensResults <- list()
 BMIS_sensResults[[1]] <- BMIS_failed
 
 
@@ -334,6 +448,16 @@ BMIS_sensResults[[3]] <- ggplot(data = BMIS_failed, aes(x = IS_number, y = Perce
 BMIS_failed_summary
 BMIS_sensResults[[2]]
 BMIS_sensResults[[3]]
+
+save(BMIS_sensResults, file = "BMIS_SensResults.RData")
+
+
+#Get % of MFs that have less than 10% RSD (and will never pick a feature)
+Try <- FullDat_fixedCulled %>%
+  select(MassFeature, Orig_RSD) %>%
+  unique() %>%
+  filter(Orig_RSD < 0.1)
+
 ```
 
 
