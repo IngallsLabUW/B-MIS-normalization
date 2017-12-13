@@ -250,11 +250,12 @@ newalldat <- left_join(alldat, injectONlY,by = "Compound.Name") %>%
   mutate(accept_MIS = (percentDiff > cut.off)) #%>%
  # filter(OrigSamp_RSD <=  RSD_ofSmp)
 
-this.filename <- paste("IntStd.as.Analyte.data.",filename, sep="")
+this.filename <- paste("IntStd.as.Analyte.data.",Sys.Date(),"-",filename, sep="")
 write.csv(newalldat, this.filename)
 
 g <- ggplot()+
-  geom_point(dat = newalldat, aes(x = RSD_ofPoo, y = RSD_ofSmp, colour = accept_MIS))+
+  geom_point(dat = newalldat, shape = 21, color = "black", size = 2,aes(x = RSD_ofPoo, y = RSD_ofSmp, fill = accept_MIS))+ 
+  scale_fill_manual(values=c("white","dark gray"))+
   geom_point(dat = injectONlY_toPlot, aes(x = RSD_ofPoo, y = RSD_ofSmp), size = 3) +
   facet_wrap(~ Compound.Name)
 
@@ -344,7 +345,7 @@ AMIS.short <- AMIS.long%>%
      summarise(IS.Options = paste(Normer, collapse=";"))
 glimpse(AMIS.short)
 
-AMIs.file <- paste0("AMIS.",filename,sep="")
+AMIs.file <- paste0("AMIS-",Sys.Date(),"-",filename, sep="")
 write.csv(AMIS.short, AMIs.file)
 ```
 
