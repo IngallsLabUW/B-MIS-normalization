@@ -71,7 +71,7 @@ ggplot(IS.dat, aes(x=`Replicate Name`, y=Area)) +
 ```
 
 #Edit IS data if necessary
-Optional if there are certain IS that aren't trustworth
+Optional if there are certain IS that aren't trustworthy
 ```{r ,  error = FALSE, warning=FALSE, message=FALSE, fig.width=8, fig.height=8}
 IS.dat <- IS.dat %>%
   filter (MassFeature != "Heavy Acetyl CoA") %>%
@@ -228,12 +228,11 @@ newalldat <- left_join(alldat, injectONlY) %>%
 write.csv(newalldat,  "IS_testResults.csv")
 
 
-
 g <- ggplot()+
-  geom_point(dat = newalldat, aes(x = RSD_ofPoo, y = RSD_ofSmp, colour = accept_MIS))+
-  geom_point(dat = injectONlY_toPlot, aes(x = RSD_ofPoo, y = RSD_ofSmp), size = 2) +
-  facet_wrap(~MassFeature)
-
+  geom_point(dat = newalldat, shape = 21, color = "black", size = 2,aes(x = RSD_ofPoo, y = RSD_ofSmp, fill = accept_MIS))+ 
+  scale_fill_manual(values=c("white","dark gray"))+
+  geom_point(dat = injectONlY_toPlot, aes(x = RSD_ofPoo, y = RSD_ofSmp), size = 3) +
+  facet_wrap(~ MassFeature)
 g
 
 ggsave("IS_experiment.pdf", plot = g, device = "pdf", width = 10, height = 10, units = "in")
@@ -355,7 +354,7 @@ BMIS_normalizedData <- FullDat_fixed %>%
   filter(MIS == FinalBMIS) %>%
   left_join(., dat %>% select(Run.Cmpd, runDate, type, SampID, replicate))
 
-new.filename <- paste("BMISd",filename,sep="_")
+new.filename <- paste(Sys.Date(),"BMISd",filename,sep="_")
 write.csv(BMIS_normalizedData, new.filename)
 print(paste("Your BMIS results are saved as", new.filename))
 print("The output of the B-MIS normalized data is in the column named PooPlusModel.")
