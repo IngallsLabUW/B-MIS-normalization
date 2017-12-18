@@ -40,5 +40,5 @@ It requires the following packages available on CRAN:
 Jamie Collins and Laura Hmelo assisted in the development and release of this code. Thanks to four anonymous reviewers whose comments improved this method.
 
 # License
-This project is licensed under the terms of the GNU General Public License v3.0
-See the LICENSE file for rights and limitations.
+This project is licensed under the terms of the GNU General Public License v3.0.
+\n See the LICENSE file for rights and limitations.
