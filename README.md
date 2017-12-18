@@ -37,7 +37,7 @@ It requires the following packages available on CRAN:
 * dplyr
 
 # Acknowledgements
-Jamie Collins and Laura Hmelo assisted in the development and publicatino of this code. Thanks to four anonymous reviewers whose comments improved this method.
+Jamie Collins and Laura Hmelo assisted in the development and release of this code. Thanks to four anonymous reviewers whose comments improved this method.
 
 # License
 This project is licensed under the terms of the GNU General Public License v3.0
