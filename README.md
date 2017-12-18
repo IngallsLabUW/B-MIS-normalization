@@ -41,4 +41,4 @@ Jamie Collins and Laura Hmelo assisted in the development and release of this co
 
 # License
 This project is licensed under the terms of the GNU General Public License v3.0.
-\n See the LICENSE file for rights and limitations.
+See the LICENSE file for rights and limitations.
