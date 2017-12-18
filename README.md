@@ -1,4 +1,6 @@
 # B-MIS-normalization
+[![DOI](https://zenodo.org/badge/71266428.svg)](https://zenodo.org/badge/latestdoi/71266428)
+
 Best-matched internal standard normalization for LC-MS based metabolomics.  
 
 This code performs peak area adjustment based on the B-MIS (best-matched internal standard) 
