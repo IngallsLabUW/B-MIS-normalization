@@ -6,6 +6,7 @@ This code performs peak area adjustment based on the B-MIS (best-matched interna
 Targeted and Untargeted versions of B-MIS are in their respective directories with example input and output files.
 
 Please cite the following paper when using this code:
+Boysen, A. K., Heal, K. R., Carlson, L. T., & Ingalls, A. E. (2017). Best-matched internal standard normalization in liquid chromatography-mass spectrometry metabolomics applied to environmental samples. Analytical Chemistry, acs.analchem.7b04400. https://doi.org/10.1021/acs.analchem.7b04400
 
 # Setup
 Run the samples should be run in the following manner for the [quality control] (https://github.com/IngallsLabUW/QualityControl) and B-MIS.
@@ -36,3 +37,8 @@ It requires the following packages available on CRAN:
 * dplyr
 
 # Acknowledgements
+Jamie Collins and Laura Hmelo assisted in the development and publicatino of this code. Thanks to four anonymous reviewers whose comments improved this method.
+
+# License
+This project is licensed under the terms of the GNU General Public License v3.0
+See the LICENSE file for rights and limitations.
